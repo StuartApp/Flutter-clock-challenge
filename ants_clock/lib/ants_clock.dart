@@ -7,6 +7,8 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_clock_helper/model.dart';
 
+import 'colony.dart';
+
 class AntsClock extends StatefulWidget {
   const AntsClock(this.model);
 
@@ -18,12 +20,15 @@ class AntsClock extends StatefulWidget {
 
 class _AntsClockState extends State<AntsClock> {
   DateTime _dateTime = DateTime.now();
+
   Timer _timer;
 
   @override
   void initState() {
     super.initState();
+
     widget.model.addListener(_updateModel);
+
     _updateTime();
     _updateModel();
   }
@@ -73,10 +78,6 @@ class _AntsClockState extends State<AntsClock> {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      color: Colors.red,
-      alignment: Alignment.center,
-      child: Text(_dateTime.toIso8601String()),
-    );
+    return Colony();
   }
 }

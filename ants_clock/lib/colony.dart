@@ -48,8 +48,8 @@ class _ColonyState extends State<Colony> with SingleTickerProviderStateMixin {
           children: <Widget>[
             Positioned(
               child: Icon(Icons.accessibility),
-              top: _colonyController.ant.y,
-              left: _colonyController.ant.x,
+              top: _colonyController.ant.position.y,
+              left: _colonyController.ant.position.x,
             )
           ],
         );

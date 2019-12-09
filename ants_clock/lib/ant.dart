@@ -1,21 +1,27 @@
-import 'package:flutter/cupertino.dart';
+import 'package:ants_clock/position.dart';
 
 class Ant {
-  // TODO Use Point instead?
-  double x;
+  Position position;
 
-  double y;
+  PositionShift _positionShift;
 
-  double angle;
+  Ant(Position initialPosition) : position = initialPosition;
 
-  double targetX;
+  bool get isCompleted => _positionShift == null || _positionShift.isCompleted;
 
-  double targetY;
+  void move(Duration elapsed) {
+    if (_positionShift != null) {
+      _positionShift.update(elapsed);
 
-  Ant({
-    @required this.x,
-    @required this.y,
-    @required this.targetX,
-    @required this.targetY,
-  });
+      position = _positionShift.position;
+
+      if (_positionShift.isCompleted) {
+        _positionShift = null;
+      }
+    }
+  }
+
+  void setTarget(Position position) {
+    _positionShift = PositionShift(this.position, position);
+  }
 }

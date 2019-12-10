@@ -1,4 +1,5 @@
 import 'package:ants_clock/colony_controller.dart';
+import 'package:ants_clock/math_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 
@@ -47,7 +48,12 @@ class _ColonyState extends State<Colony> with SingleTickerProviderStateMixin {
         return Stack(
           children: <Widget>[
             Positioned(
-              child: Icon(Icons.accessibility),
+              child: Transform(
+                transform: Matrix4.rotationZ(
+                    degToRad(_colonyController.ant.position.bearing)),
+                origin: Offset(12.0, 12.0),
+                child: Icon(Icons.accessibility),
+              ),
               top: _colonyController.ant.position.y,
               left: _colonyController.ant.position.x,
             )

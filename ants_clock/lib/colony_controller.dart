@@ -8,6 +8,7 @@ class ColonyController {
       worldWidth,
       worldHeight,
       Ant(Position.random(worldWidth, worldHeight)),
+      // Ant(Position(50.0, 50.0, 0.0)),
     );
   }
 
@@ -26,6 +27,7 @@ class ColonyController {
 
     if (ant.isCompleted) {
       ant.setTarget(Position.random(width, height));
+      // ant.setTarget(Position(100.0, 100.0, 0.0));
     }
 
     ant.move(elapsed);

@@ -1,27 +1,29 @@
 import 'package:ants_clock/position.dart';
+import 'package:ants_clock/position_shifter.dart';
 
 class Ant {
   Position position;
 
-  PositionShift _positionShift;
+  PositionShifter _positionShifter;
 
   Ant(Position initialPosition) : position = initialPosition;
 
-  bool get isCompleted => _positionShift == null || _positionShift.isCompleted;
+  bool get isCompleted =>
+      _positionShifter == null || _positionShifter.isCompleted;
 
   void move(Duration elapsed) {
-    if (_positionShift != null) {
-      _positionShift.update(elapsed);
+    if (_positionShifter != null) {
+      _positionShifter.shift(elapsed);
 
-      position = _positionShift.position;
+      position = _positionShifter.position;
 
-      if (_positionShift.isCompleted) {
-        _positionShift = null;
+      if (_positionShifter.isCompleted) {
+        _positionShifter = null;
       }
     }
   }
 
   void setTarget(Position position) {
-    _positionShift = PositionShift(this.position, position);
+    _positionShifter = PositionShifter(this.position, position);
   }
 }

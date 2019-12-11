@@ -31,7 +31,7 @@ class Position {
   double bearingTo(Position position) {
     final c = distanceTo(position);
     final a = (position.x - x).abs();
-    final angle = radToDeg(acos(a / c));
+    final angle = c > 0.0 && a > 0.0 ? radToDeg(acos(a / c)) : 0.0;
     if (position.x >= x) {
       if (position.y <= y) {
         return 90.0 - angle;

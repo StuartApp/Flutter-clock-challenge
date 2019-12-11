@@ -37,27 +37,30 @@ class _ColonyState extends State<Colony> with SingleTickerProviderStateMixin {
     return LayoutBuilder(
       builder: (context, boxConstraints) {
         if (_colonyController == null ||
-            _colonyController.width != boxConstraints.maxWidth ||
-            _colonyController.height != boxConstraints.maxHeight) {
+            _colonyController.worldWidth != boxConstraints.maxWidth ||
+            _colonyController.worldHeight != boxConstraints.maxHeight) {
           _colonyController = ColonyController(
             boxConstraints.maxWidth,
             boxConstraints.maxHeight,
           );
         }
 
+        final widgets = <Widget>[];
+
+        for (var ant in _colonyController.ants) {
+          widgets.add(Positioned(
+            child: Transform(
+              transform: Matrix4.rotationZ(degToRad(ant.position.bearing)),
+              origin: Offset(12.0, 12.0),
+              child: Icon(Icons.accessibility),
+            ),
+            top: ant.position.y,
+            left: ant.position.x,
+          ));
+        }
+
         return Stack(
-          children: <Widget>[
-            Positioned(
-              child: Transform(
-                transform: Matrix4.rotationZ(
-                    degToRad(_colonyController.ant.position.bearing)),
-                origin: Offset(12.0, 12.0),
-                child: Icon(Icons.accessibility),
-              ),
-              top: _colonyController.ant.position.y,
-              left: _colonyController.ant.position.x,
-            )
-          ],
+          children: widgets,
         );
       },
     );

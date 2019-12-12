@@ -8,8 +8,8 @@ class Ant {
 
   Ant(Position initialPosition) : position = initialPosition;
 
-  bool get isCompleted =>
-      _positionShifter == null || _positionShifter.isCompleted;
+  bool get isMoveFinished =>
+      _positionShifter == null || _positionShifter.isFinished;
 
   void move(Duration elapsed) {
     if (_positionShifter != null) {
@@ -17,7 +17,7 @@ class Ant {
 
       position = _positionShifter.position;
 
-      if (_positionShifter.isCompleted) {
+      if (_positionShifter.isFinished) {
         _positionShifter = null;
       }
     }

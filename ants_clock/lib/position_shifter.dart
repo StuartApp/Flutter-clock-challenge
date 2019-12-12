@@ -4,7 +4,7 @@ import 'package:flutter/animation.dart';
 abstract class PositionShifter {
   Position get position;
 
-  bool get isCompleted => true;
+  bool get isFinished;
 
   factory PositionShifter(Position begin, Position end) {
     final bearing = begin.bearingTo(end);
@@ -28,7 +28,7 @@ class _WalkPositionShifter implements PositionShifter {
       _duration = distance ~/ (_pixelsPerSecond / 1000);
     } else {
       _duration = 0;
-      _isCompleted = true;
+      _isFinished = true;
     }
 
     _xAnimatable = _createAnimatable(begin.x, end.x);
@@ -49,13 +49,13 @@ class _WalkPositionShifter implements PositionShifter {
 
   Position _position;
 
-  bool _isCompleted = false;
+  bool _isFinished = false;
 
   @override
   Position get position => _position;
 
   @override
-  bool get isCompleted => _isCompleted;
+  bool get isFinished => _isFinished;
 
   @override
   void shift(Duration elapsed) {
@@ -70,7 +70,7 @@ class _WalkPositionShifter implements PositionShifter {
       _position.bearing,
     );
 
-    _isCompleted = t == 1.0;
+    _isFinished = t == 1.0;
   }
 
   Animatable<double> _createAnimatable(double begin, double end) {
@@ -87,7 +87,7 @@ class _TurnPositionShifter implements PositionShifter {
       _duration = angle.abs() ~/ (_degreesPerSecond / 1000);
     } else {
       _duration = 0;
-      _isCompleted = true;
+      _isFinished = true;
     }
 
     _bearingAnimatable = _createAnimatable(
@@ -108,13 +108,13 @@ class _TurnPositionShifter implements PositionShifter {
 
   Position _position;
 
-  bool _isCompleted = false;
+  bool _isFinished = false;
 
   @override
   Position get position => _position;
 
   @override
-  bool get isCompleted => _isCompleted;
+  bool get isFinished => _isFinished;
 
   @override
   void shift(Duration elapsed) {
@@ -129,7 +129,7 @@ class _TurnPositionShifter implements PositionShifter {
       _normalizeAngle(_bearingAnimatable.transform(t)),
     );
 
-    _isCompleted = t == 1.0;
+    _isFinished = t == 1.0;
   }
 
   Animatable<double> _createAnimatable(double begin, double end) {
@@ -176,13 +176,13 @@ class _SequencePositionShifter implements PositionShifter {
   Position get position => _currentShifter.position;
 
   @override
-  bool get isCompleted =>
+  bool get isFinished =>
       _currentShifterIndex == _shifters.length - 1 &&
-      _currentShifter.isCompleted;
+      _currentShifter.isFinished;
 
   @override
   void shift(Duration elapsed) {
-    if (_currentShifter.isCompleted &&
+    if (_currentShifter.isFinished &&
         _currentShifterIndex < _shifters.length - 1) {
       _currentShifterIndex++;
       _currentShifter.shift(elapsed);

@@ -54,8 +54,8 @@ class _ColonyState extends State<Colony> with SingleTickerProviderStateMixin {
               origin: Offset(12.0, 12.0),
               child: Icon(Icons.accessibility),
             ),
-            top: ant.position.y,
-            left: ant.position.x,
+            top: ant.position.y - 12.0,
+            left: ant.position.x - 12.0,
           ));
         }
 

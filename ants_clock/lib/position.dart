@@ -11,9 +11,9 @@ class Position {
 
   final double bearing;
 
-  Position(this.x, this.y, this.bearing);
+  const Position(this.x, this.y, this.bearing);
 
-  Position.zero() : this(0.0, 0.0, 0.0);
+  const Position.zero() : this(0.0, 0.0, 0.0);
 
   Position.random(double width, double height)
       : this(

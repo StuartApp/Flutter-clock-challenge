@@ -1,5 +1,6 @@
 import 'dart:math';
 
+import 'package:ants_clock/digit.dart';
 import 'package:ants_clock/position.dart';
 
 import 'ant.dart';
@@ -27,19 +28,25 @@ class ColonyController {
 
   final _random = Random();
 
+  var _number = 0;
+
   void tick(Duration elapsed) {
     _elapsed ??= elapsed;
 
     if (ants.every((ant) => ant.isMoveFinished)) {
-      var selectedIndex = _random.nextInt(antsNumber);
+      Map<int, Position> antTargets = _assignAntTargets(_number);
+
       for (var i = 0; i < ants.length; ++i) {
         var ant = ants[i];
-        if (i == selectedIndex) {
-          ant.setTarget(_createPositionAtCenter());
+        if (antTargets.containsKey(i)) {
+          ant.setTarget(antTargets[i]);
         } else {
           ant.setTarget(_createPositionAtBoundary());
         }
       }
+
+      _number++;
+      if (_number > 9) _number = 0;
     }
 
     for (var ant in ants) {
@@ -49,12 +56,25 @@ class ColonyController {
     _elapsed = elapsed;
   }
 
-  Position _createPositionAtCenter() {
-    return Position(
+  Map<int, Position> _assignAntTargets(int number) {
+    final digit = Digit(
+      number,
       worldWidth / 2.0,
       worldHeight / 2.0,
-      0.0,
+      worldHeight / 2.0,
+      worldHeight / 2.0,
     );
+
+    final antTargets = <int, Position>{};
+
+    for (var i = 0; i < digit.positions.length; ++i) {
+      int antIndex;
+      do {
+        antIndex = _random.nextInt(antsNumber);
+      } while (antTargets.containsKey(antIndex));
+      antTargets[antIndex] = digit.positions[i];
+    }
+    return antTargets;
   }
 
   Position _createPositionAtBoundary() {

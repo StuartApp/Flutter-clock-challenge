@@ -1,6 +1,8 @@
 import 'package:ants_clock/position.dart';
 import 'package:flutter/animation.dart';
 
+import 'math_utils.dart';
+
 abstract class PositionShifter {
   Position get position;
 
@@ -126,7 +128,7 @@ class _TurnPositionShifter implements PositionShifter {
     _position = Position(
       _position.x,
       _position.y,
-      _normalizeAngle(_bearingAnimatable.transform(t)),
+      normalizeAngle(_bearingAnimatable.transform(t)),
     );
 
     _isFinished = t == 1.0;
@@ -146,16 +148,6 @@ class _TurnPositionShifter implements PositionShifter {
       final angle1 = begin - end;
       final angle2 = (360.0 - begin) + end;
       return angle1 <= angle2 ? -angle1 : angle2;
-    }
-  }
-
-  double _normalizeAngle(double angle) {
-    if (angle > 360.0) {
-      return angle - 360.0;
-    } else if (angle < 0.0) {
-      return 360.0 + angle;
-    } else {
-      return angle;
     }
   }
 }

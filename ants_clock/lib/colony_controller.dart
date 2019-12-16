@@ -6,13 +6,17 @@ import 'package:ants_clock/position.dart';
 import 'ant.dart';
 
 class ColonyController {
-  ColonyController(this.worldWidth, this.worldHeight) {
+  ColonyController(this.worldWidth, this.worldHeight, int hour, int minute) {
+    _hour = hour;
+    _minute = minute;
+    _isTimeUpdated = true;
+
     for (var i = 0; i < antsNumber; ++i) {
       ants.add(Ant(Position.random(worldWidth, worldHeight)));
     }
   }
 
-  static const antsNumber = 100;
+  static const antsNumber = 75;
 
   static const boundaryPadding = 20.0;
 
@@ -24,17 +28,27 @@ class ColonyController {
 
   final List<Ant> ants = [];
 
+  int _hour = 0;
+
+  int _minute = 0;
+
+  bool _isTimeUpdated = false;
+
   Duration _elapsed;
 
   final _random = Random();
 
-  var _number = 0;
+  void setTime(int hour, int minute) {
+    _hour = hour;
+    _minute = minute;
+    _isTimeUpdated = true;
+  }
 
   void tick(Duration elapsed) {
     _elapsed ??= elapsed;
 
-    if (ants.every((ant) => ant.isMoveFinished)) {
-      Map<int, Position> antTargets = _assignAntTargets(_number);
+    if (_isTimeUpdated && ants.every((ant) => ant.isMoveFinished)) {
+      Map<int, Position> antTargets = _assignAntTargets(_hour, _minute);
 
       for (var i = 0; i < ants.length; ++i) {
         var ant = ants[i];
@@ -45,8 +59,7 @@ class ColonyController {
         }
       }
 
-      _number++;
-      if (_number > 9) _number = 0;
+      _isTimeUpdated = false;
     }
 
     for (var ant in ants) {
@@ -56,24 +69,55 @@ class ColonyController {
     _elapsed = elapsed;
   }
 
-  Map<int, Position> _assignAntTargets(int number) {
-    final digit = Digit(
-      number,
-      worldWidth / 2.0,
-      worldHeight / 2.0,
-      worldHeight / 2.0,
-      worldHeight / 2.0,
-    );
+  Map<int, Position> _assignAntTargets(int hour, int minute) {
+    final width = worldHeight / 3.0;
+    final height = worldHeight / 3.0;
+
+    final digits = [
+      Digit(
+        hour ~/ 10,
+        worldWidth / 2.0 - ((width / 2.0) * 3.0),
+        worldHeight / 2.0,
+        width,
+        height,
+      ),
+      Digit(
+        hour % 10,
+        worldWidth / 2.0 - ((width / 2.0) * 1.0),
+        worldHeight / 2.0,
+        width,
+        height,
+      ),
+      Digit(
+        minute ~/ 10,
+        worldWidth / 2.0 + ((width / 2.0) * 1.0),
+        worldHeight / 2.0,
+        width,
+        height,
+      ),
+      Digit(
+        minute % 10,
+        worldWidth / 2.0 + ((width / 2.0) * 3.0),
+        worldHeight / 2.0,
+        width,
+        height,
+      )
+    ];
 
     final antTargets = <int, Position>{};
 
-    for (var i = 0; i < digit.positions.length; ++i) {
-      int antIndex;
-      do {
-        antIndex = _random.nextInt(antsNumber);
-      } while (antTargets.containsKey(antIndex));
-      antTargets[antIndex] = digit.positions[i];
+    for (var digit in digits) {
+      for (var i = 0; i < digit.positions.length; ++i) {
+        int antIndex;
+
+        do {
+          antIndex = _random.nextInt(antsNumber);
+        } while (antTargets.containsKey(antIndex));
+
+        antTargets[antIndex] = digit.positions[i];
+      }
     }
+
     return antTargets;
   }
 

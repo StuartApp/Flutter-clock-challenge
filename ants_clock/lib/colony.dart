@@ -4,6 +4,16 @@ import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 
 class Colony extends StatefulWidget {
+  final int hour;
+
+  final int minute;
+
+  const Colony({
+    Key key,
+    @required this.hour,
+    @required this.minute,
+  }) : super(key: key);
+
   @override
   _ColonyState createState() => _ColonyState();
 }
@@ -27,6 +37,14 @@ class _ColonyState extends State<Colony> with SingleTickerProviderStateMixin {
   }
 
   @override
+  void didUpdateWidget(Colony oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.hour != oldWidget.hour || widget.minute != oldWidget.minute) {
+      _colonyController?.setTime(widget.hour, widget.minute);
+    }
+  }
+
+  @override
   void dispose() {
     _ticker?.dispose();
     super.dispose();
@@ -42,6 +60,8 @@ class _ColonyState extends State<Colony> with SingleTickerProviderStateMixin {
           _colonyController = ColonyController(
             boxConstraints.maxWidth,
             boxConstraints.maxHeight,
+            widget.hour,
+            widget.minute,
           );
         }
 
@@ -51,11 +71,14 @@ class _ColonyState extends State<Colony> with SingleTickerProviderStateMixin {
           widgets.add(Positioned(
             child: Transform(
               transform: Matrix4.rotationZ(degToRad(ant.position.bearing)),
-              origin: Offset(12.0, 12.0),
-              child: Icon(Icons.accessibility),
+              origin: Offset(9.0, 9.0),
+              child: Icon(
+                Icons.accessibility,
+                size: 18.0,
+              ),
             ),
-            top: ant.position.y - 12.0,
-            left: ant.position.x - 12.0,
+            top: ant.position.y - 9.0,
+            left: ant.position.x - 9.0,
           ));
         }
 

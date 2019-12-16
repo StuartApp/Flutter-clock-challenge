@@ -78,6 +78,9 @@ class _AntsClockState extends State<AntsClock> {
 
   @override
   Widget build(BuildContext context) {
-    return Colony();
+    return Colony(
+      hour: _dateTime.hour,
+      minute: _dateTime.minute,
+    );
   }
 }

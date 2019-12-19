@@ -3,6 +3,8 @@ import 'package:ants_clock/math_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 
+import 'ant.dart';
+
 class Colony extends StatefulWidget {
   final int hour;
 
@@ -71,14 +73,14 @@ class _ColonyState extends State<Colony> with SingleTickerProviderStateMixin {
           widgets.add(Positioned(
             child: Transform(
               transform: Matrix4.rotationZ(degToRad(ant.position.bearing)),
-              origin: Offset(9.0, 9.0),
+              origin: Offset(Ant.halfSize, Ant.halfSize),
               child: Icon(
                 Icons.accessibility,
-                size: 18.0,
+                size: Ant.size,
               ),
             ),
-            top: ant.position.y - 9.0,
-            left: ant.position.x - 9.0,
+            top: ant.position.y - Ant.halfSize,
+            left: ant.position.x - Ant.halfSize,
           ));
         }
 

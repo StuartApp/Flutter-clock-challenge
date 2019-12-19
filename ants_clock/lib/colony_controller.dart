@@ -9,18 +9,18 @@ class ColonyController {
   ColonyController(this.worldWidth, this.worldHeight, int hour, int minute) {
     _hour = hour;
     _minute = minute;
-    _isTimeUpdated = true;
+    _shouldRenderTime = true;
 
     for (var i = 0; i < antsNumber; ++i) {
       ants.add(Ant(Position.random(worldWidth, worldHeight)));
     }
   }
 
-  static const antsNumber = 75;
+  static const antsNumber = 60;
 
-  static const boundaryPadding = 20.0;
+  static const boundaryPadding = 10.0;
 
-  static const boundarySize = 10.0;
+  static const boundarySize = 20.0;
 
   final double worldWidth;
 
@@ -32,34 +32,33 @@ class ColonyController {
 
   int _minute = 0;
 
-  bool _isTimeUpdated = false;
+  bool _shouldRenderTime = false;
 
   Duration _elapsed;
 
   final _random = Random();
 
+  final _antDigitPositions = <int, Position>{};
+
+  final _antBoundaryPositions = <int, Position>{};
+
   void setTime(int hour, int minute) {
     _hour = hour;
     _minute = minute;
-    _isTimeUpdated = true;
+    _shouldRenderTime = true;
   }
 
   void tick(Duration elapsed) {
     _elapsed ??= elapsed;
 
-    if (_isTimeUpdated && ants.every((ant) => ant.isMoveFinished)) {
-      Map<int, Position> antTargets = _assignAntTargets(_hour, _minute);
-
-      for (var i = 0; i < ants.length; ++i) {
-        var ant = ants[i];
-        if (antTargets.containsKey(i)) {
-          ant.setTarget(antTargets[i]);
-        } else {
-          ant.setTarget(_createPositionAtBoundary());
-        }
-      }
-
-      _isTimeUpdated = false;
+    if (_shouldRenderTime) {
+      _assignAntDigitPositions(_hour, _minute);
+      _assignAntBoundaryPositions();
+      _shouldRenderTime = false;
+    } else if (_random.nextInt(100) == 0) {
+      final antIndexList = _antBoundaryPositions.keys.toList();
+      final antIndex = antIndexList[_random.nextInt(antIndexList.length)];
+      _assignAntBoundaryPosition(antIndex);
     }
 
     for (var ant in ants) {
@@ -69,56 +68,47 @@ class ColonyController {
     _elapsed = elapsed;
   }
 
-  Map<int, Position> _assignAntTargets(int hour, int minute) {
-    final width = worldHeight / 3.0;
-    final height = worldHeight / 3.0;
+  void _assignAntDigitPositions(int hour, int minute) {
+    _antDigitPositions.clear();
 
-    final digits = [
-      Digit(
-        hour ~/ 10,
-        worldWidth / 2.0 - ((width / 2.0) * 3.0),
-        worldHeight / 2.0,
-        width,
-        height,
-      ),
-      Digit(
-        hour % 10,
-        worldWidth / 2.0 - ((width / 2.0) * 1.0),
-        worldHeight / 2.0,
-        width,
-        height,
-      ),
-      Digit(
-        minute ~/ 10,
-        worldWidth / 2.0 + ((width / 2.0) * 1.0),
-        worldHeight / 2.0,
-        width,
-        height,
-      ),
-      Digit(
-        minute % 10,
-        worldWidth / 2.0 + ((width / 2.0) * 3.0),
-        worldHeight / 2.0,
-        width,
-        height,
-      )
-    ];
-
-    final antTargets = <int, Position>{};
+    List<Digit> digits = _createDigits(hour, minute);
 
     for (var digit in digits) {
       for (var i = 0; i < digit.positions.length; ++i) {
         int antIndex;
-
         do {
           antIndex = _random.nextInt(antsNumber);
-        } while (antTargets.containsKey(antIndex));
-
-        antTargets[antIndex] = digit.positions[i];
+        } while (_antDigitPositions.containsKey(antIndex));
+        _antDigitPositions[antIndex] = digit.positions[i];
+        ants[antIndex].setTarget(digit.positions[i]);
       }
     }
+  }
 
-    return antTargets;
+  void _assignAntBoundaryPositions() {
+    _antBoundaryPositions.clear();
+
+    for (var i = 0; i < ants.length; ++i) {
+      if (!_antDigitPositions.containsKey(i)) {
+        _assignAntBoundaryPosition(i);
+      }
+    }
+  }
+
+  void _assignAntBoundaryPosition(int antIndex) {
+    _antBoundaryPositions.remove(antIndex);
+
+    Position position;
+    final bool Function(Position) isCloseToPosition = (p) {
+      return p.distanceTo(position) <= Ant.size;
+    };
+
+    do {
+      position = _createPositionAtBoundary();
+    } while (_antBoundaryPositions.values.any(isCloseToPosition));
+
+    _antBoundaryPositions[antIndex] = position;
+    ants[antIndex].setTarget(position);
   }
 
   Position _createPositionAtBoundary() {
@@ -156,5 +146,42 @@ class ColonyController {
       default:
         return Position.zero();
     }
+  }
+
+  List<Digit> _createDigits(int hour, int minute) {
+    final width = worldHeight / 3.0;
+    final height = worldHeight / 3.0;
+
+    final digits = [
+      Digit(
+        hour ~/ 10,
+        worldWidth / 2.0 - ((width / 2.0) * 3.0),
+        worldHeight / 2.0,
+        width,
+        height,
+      ),
+      Digit(
+        hour % 10,
+        worldWidth / 2.0 - ((width / 2.0) * 1.0),
+        worldHeight / 2.0,
+        width,
+        height,
+      ),
+      Digit(
+        minute ~/ 10,
+        worldWidth / 2.0 + ((width / 2.0) * 1.0),
+        worldHeight / 2.0,
+        width,
+        height,
+      ),
+      Digit(
+        minute % 10,
+        worldWidth / 2.0 + ((width / 2.0) * 3.0),
+        worldHeight / 2.0,
+        width,
+        height,
+      )
+    ];
+    return digits;
   }
 }

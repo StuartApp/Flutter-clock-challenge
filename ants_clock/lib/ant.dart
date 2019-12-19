@@ -2,11 +2,15 @@ import 'package:ants_clock/position.dart';
 import 'package:ants_clock/position_shifter.dart';
 
 class Ant {
+  static const size = 18.0;
+
+  static const halfSize = size / 2;
+
   Position position;
 
   PositionShifter _positionShifter;
 
-  Ant(Position initialPosition) : position = initialPosition;
+  Ant(this.position);
 
   bool get isMoveFinished =>
       _positionShifter == null || _positionShifter.isFinished;

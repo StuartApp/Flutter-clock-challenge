@@ -1,4 +1,5 @@
 import 'dart:math';
+import 'dart:ui';
 
 import 'package:ants_clock/math_utils.dart';
 
@@ -62,4 +63,12 @@ class Position {
       bearing ?? this.bearing,
     );
   }
+}
+
+Position lerpPosition(Position begin, Position end, double t) {
+  return Position(
+    lerpDouble(begin.x, end.x, t),
+    lerpDouble(begin.y, end.y, t),
+    begin.bearingTo(end),
+  );
 }

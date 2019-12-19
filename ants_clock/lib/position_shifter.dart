@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:ants_clock/position.dart';
 import 'package:flutter/animation.dart';
 
@@ -8,7 +10,21 @@ abstract class PositionShifter {
 
   bool get isFinished;
 
+  static final _random = Random();
+
   factory PositionShifter(Position begin, Position end) {
+    var t = 0.5 + (0.1 * _random.nextDouble()) - 0.05;
+    final split = _shakePosition(lerpPosition(begin, end, t));
+
+    return _SequencePositionShifter([
+      _createSequence(begin, split),
+      _createSequence(split, end),
+    ]);
+  }
+
+  void shift(Duration elapsed);
+
+  static PositionShifter _createSequence(Position begin, Position end) {
     final bearing = begin.bearingTo(end);
     final beginRotated = begin.copy(bearing: bearing);
     final endRotated = end.copy(bearing: bearing);
@@ -20,7 +36,14 @@ abstract class PositionShifter {
     ]);
   }
 
-  void shift(Duration elapsed);
+  static Position _shakePosition(Position position) {
+    return position.copy(
+      x: position.x + (_random.nextDouble() * 20.0) - 10.0,
+      y: position.y + (_random.nextDouble() * 20.0) - 10.0,
+      bearing: normalizeAngle(
+          position.bearing + (_random.nextDouble() * 20.0) - 10.0),
+    );
+  }
 }
 
 class _WalkPositionShifter implements PositionShifter {

@@ -75,7 +75,7 @@ class _ColonyState extends State<Colony> with SingleTickerProviderStateMixin {
               transform: Matrix4.rotationZ(degToRad(ant.position.bearing)),
               origin: Offset(Ant.halfSize, Ant.halfSize),
               child: Icon(
-                Icons.accessibility,
+                ant.frame == 0 ? Icons.accessibility : Icons.accessibility_new,
                 size: Ant.size,
               ),
             ),

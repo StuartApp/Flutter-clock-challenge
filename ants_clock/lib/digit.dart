@@ -1,7 +1,30 @@
 import 'package:ants_clock/math_utils.dart';
 import 'package:ants_clock/position.dart';
 
-class Digit {
+abstract class Digit {
+  factory Digit.number(
+      int number, double x, double y, double width, double height) {
+    return _NumberDigit(number, x, y, width, height);
+  }
+
+  factory Digit.separator(double x, double y, double width, double height) {
+    return _SeparatorDigit(x, y, width, height);
+  }
+
+  List<Position> get positions;
+}
+
+class _NumberDigit implements Digit {
+  _NumberDigit(int number, double x, double y, double width, double height) {
+    _positionsMap.forEach((position, numbers) {
+      if (numbers.contains(number)) {
+        _positions.add(_createPosition(position, x, y, width, height));
+      }
+    });
+  }
+
+  List<Position> get positions => _positions;
+
   static const _horizontal = 90.0;
   static const _vertical = 0.0;
 
@@ -45,24 +68,30 @@ class Digit {
   };
 
   final List<Position> _positions = [];
+}
 
-  Digit(int number, x, y, width, height) {
-    _positionsMap.forEach((position, numbers) {
-      if (numbers.contains(number)) {
-        _positions.add(_createPosition(position, x, y, width, height));
-      }
-    });
+class _SeparatorDigit implements Digit {
+  _SeparatorDigit(double x, double y, double width, double height) {
+    _positions.add(_createPosition(_top, x, y, width, height));
+    _positions.add(_createPosition(_bottom, x, y, width, height));
   }
 
   List<Position> get positions => _positions;
 
-  Position _createPosition(Position position, x, y, width, height) {
-    final orientation = random.nextInt(2) == 0 ? 0.0 : 180.0;
-    final noise = (random.nextDouble() * 20.0) - 10.0;
-    return Position(
-      x + ((position.x - 0.5) * width),
-      y + ((position.y - 0.5) * height),
-      normalizeAngle(position.bearing + orientation + noise),
-    );
-  }
+  static const _top = Position(0.5, 0.35, 0.0);
+
+  static const _bottom = Position(0.5, 0.65, 0.0);
+
+  final List<Position> _positions = [];
+}
+
+Position _createPosition(
+    Position position, double x, double y, double width, double height) {
+  final orientation = random.nextInt(2) == 0 ? 0.0 : 180.0;
+  final noise = (random.nextDouble() * 20.0) - 10.0;
+  return Position(
+    x + ((position.x - 0.5) * width),
+    y + ((position.y - 0.5) * height),
+    normalizeAngle(position.bearing + orientation + noise),
+  );
 }

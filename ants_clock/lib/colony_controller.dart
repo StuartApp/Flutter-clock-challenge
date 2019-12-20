@@ -149,28 +149,34 @@ class ColonyController {
     final height = worldHeight / 3.0;
 
     final digits = [
-      Digit(
+      Digit.number(
         hour ~/ 10,
         worldWidth / 2.0 - ((width / 2.0) * 3.0),
         worldHeight / 2.0,
         width,
         height,
       ),
-      Digit(
+      Digit.number(
         hour % 10,
-        worldWidth / 2.0 - ((width / 2.0) * 1.0),
+        worldWidth / 2.0 - ((width / 2.0) * 1.2),
         worldHeight / 2.0,
         width,
         height,
       ),
-      Digit(
+      Digit.separator(
+        worldWidth / 2.0,
+        worldHeight / 2.0,
+        width,
+        height,
+      ),
+      Digit.number(
         minute ~/ 10,
-        worldWidth / 2.0 + ((width / 2.0) * 1.0),
+        worldWidth / 2.0 + ((width / 2.0) * 1.2),
         worldHeight / 2.0,
         width,
         height,
       ),
-      Digit(
+      Digit.number(
         minute % 10,
         worldWidth / 2.0 + ((width / 2.0) * 3.0),
         worldHeight / 2.0,

@@ -1,5 +1,3 @@
-import 'dart:math';
-
 import 'package:ants_clock/position.dart';
 import 'package:flutter/animation.dart';
 
@@ -10,21 +8,7 @@ abstract class PositionShifter {
 
   bool get isFinished;
 
-  static final _random = Random();
-
   factory PositionShifter(Position begin, Position end) {
-    var t = 0.5 + (0.1 * _random.nextDouble()) - 0.05;
-    final split = _shakePosition(lerpPosition(begin, end, t));
-
-    return _SequencePositionShifter([
-      _createSequence(begin, split),
-      _createSequence(split, end),
-    ]);
-  }
-
-  void shift(Duration elapsed);
-
-  static PositionShifter _createSequence(Position begin, Position end) {
     final bearing = begin.bearingTo(end);
     final beginRotated = begin.copy(bearing: bearing);
     final endRotated = end.copy(bearing: bearing);
@@ -36,14 +20,7 @@ abstract class PositionShifter {
     ]);
   }
 
-  static Position _shakePosition(Position position) {
-    return position.copy(
-      x: position.x + (_random.nextDouble() * 20.0) - 10.0,
-      y: position.y + (_random.nextDouble() * 20.0) - 10.0,
-      bearing: normalizeAngle(
-          position.bearing + (_random.nextDouble() * 20.0) - 10.0),
-    );
-  }
+  void shift(Duration elapsed);
 }
 
 class _WalkPositionShifter implements PositionShifter {
@@ -68,6 +45,8 @@ class _WalkPositionShifter implements PositionShifter {
 
   int _duration;
 
+  Duration _lateralMovementStart;
+
   Animatable<double> _xAnimatable;
 
   Animatable<double> _yAnimatable;
@@ -75,6 +54,8 @@ class _WalkPositionShifter implements PositionShifter {
   Position _position;
 
   bool _isFinished = false;
+
+  _SideShifter _sideShifter = _SideShifter();
 
   @override
   Position get position => _position;
@@ -85,14 +66,18 @@ class _WalkPositionShifter implements PositionShifter {
   @override
   void shift(Duration elapsed) {
     _start ??= elapsed;
+    _lateralMovementStart ??= elapsed;
 
     final elapsedSinceStart = (elapsed - _start).inMilliseconds;
     final t = (elapsedSinceStart / _duration).clamp(0.0, 1.0);
 
-    _position = Position(
-      _xAnimatable.transform(t),
-      _yAnimatable.transform(t),
-      _position.bearing,
+    _position = _sideShifter.shift(
+      elapsed,
+      Position(
+        _xAnimatable.transform(t),
+        _yAnimatable.transform(t),
+        _position.bearing,
+      ),
     );
 
     _isFinished = t == 1.0;
@@ -101,6 +86,43 @@ class _WalkPositionShifter implements PositionShifter {
   Animatable<double> _createAnimatable(double begin, double end) {
     return Tween(begin: begin, end: end)
         .chain(CurveTween(curve: const Cubic(0.10, 0.0, 0.90, 1.0)));
+  }
+}
+
+class _SideShifter {
+  _SideShifter() {
+    _reset();
+  }
+
+  Duration _start;
+
+  int _duration;
+
+  Animatable<double> _animatable;
+
+  Position shift(Duration elapsed, Position position) {
+    _start ??= elapsed;
+
+    final elapsedSinceStart = (elapsed - _start).inMilliseconds;
+    final t = (elapsedSinceStart / _duration).clamp(0.0, 1.0);
+
+    var movedPosition = position.move(
+      _animatable.transform(t),
+      normalizeAngle(position.bearing + 90.0),
+    );
+
+    if (elapsedSinceStart > _duration) _reset();
+
+    return movedPosition;
+  }
+
+  void _reset() {
+    _start = null;
+    _duration = 50 + random.nextInt(50);
+    _animatable = Tween(
+      begin: _animatable?.transform(1.0) ?? 0.0,
+      end: random.nextDouble() * 3.0 - 1.5,
+    );
   }
 }
 

@@ -1,9 +1,8 @@
-import 'dart:math';
-
 import 'package:ants_clock/digit.dart';
 import 'package:ants_clock/position.dart';
 
 import 'ant.dart';
+import 'math_utils.dart';
 
 class ColonyController {
   ColonyController(this.worldWidth, this.worldHeight, int hour, int minute) {
@@ -36,8 +35,6 @@ class ColonyController {
 
   Duration _elapsed;
 
-  final _random = Random();
-
   final _antDigitPositions = <int, Position>{};
 
   final _antBoundaryPositions = <int, Position>{};
@@ -55,9 +52,9 @@ class ColonyController {
       _assignAntDigitPositions(_hour, _minute);
       _assignAntBoundaryPositions();
       _shouldRenderTime = false;
-    } else if (_random.nextInt(100) == 0) {
+    } else if (random.nextInt(100) == 0) {
       final antIndexList = _antBoundaryPositions.keys.toList();
-      final antIndex = antIndexList[_random.nextInt(antIndexList.length)];
+      final antIndex = antIndexList[random.nextInt(antIndexList.length)];
       _assignAntBoundaryPosition(antIndex);
     }
 
@@ -77,7 +74,7 @@ class ColonyController {
       for (var i = 0; i < digit.positions.length; ++i) {
         int antIndex;
         do {
-          antIndex = _random.nextInt(antsNumber);
+          antIndex = random.nextInt(antsNumber);
         } while (_antDigitPositions.containsKey(antIndex));
         _antDigitPositions[antIndex] = digit.positions[i];
         ants[antIndex].setTarget(digit.positions[i]);
@@ -112,36 +109,35 @@ class ColonyController {
   }
 
   Position _createPositionAtBoundary() {
-    switch (_random.nextInt(4)) {
+    switch (random.nextInt(4)) {
       case 0:
         return Position(
-          (_random.nextDouble() * boundarySize) + boundaryPadding,
-          (_random.nextDouble() * (worldHeight - (boundaryPadding * 2))) +
+          (random.nextDouble() * boundarySize) + boundaryPadding,
+          (random.nextDouble() * (worldHeight - (boundaryPadding * 2))) +
               boundaryPadding,
-          _random.nextDouble() * 360.0,
+          random.nextDouble() * 360.0,
         );
       case 1:
         return Position(
-          (_random.nextDouble() * (worldWidth - (boundaryPadding * 2))) +
+          (random.nextDouble() * (worldWidth - (boundaryPadding * 2))) +
               boundaryPadding,
-          (_random.nextDouble() * boundarySize) + boundaryPadding,
-          _random.nextDouble() * 360.0,
+          (random.nextDouble() * boundarySize) + boundaryPadding,
+          random.nextDouble() * 360.0,
         );
       case 2:
         return Position(
-          worldWidth -
-              ((_random.nextDouble() * boundarySize) + boundaryPadding),
-          (_random.nextDouble() * (worldHeight - (boundaryPadding * 2))) +
+          worldWidth - ((random.nextDouble() * boundarySize) + boundaryPadding),
+          (random.nextDouble() * (worldHeight - (boundaryPadding * 2))) +
               boundaryPadding,
-          _random.nextDouble() * 360.0,
+          random.nextDouble() * 360.0,
         );
       case 3:
         return Position(
-          (_random.nextDouble() * (worldWidth - (boundaryPadding * 2))) +
+          (random.nextDouble() * (worldWidth - (boundaryPadding * 2))) +
               boundaryPadding,
           worldHeight -
-              ((_random.nextDouble() * boundarySize) + boundaryPadding),
-          _random.nextDouble() * 360.0,
+              ((random.nextDouble() * boundarySize) + boundaryPadding),
+          random.nextDouble() * 360.0,
         );
       default:
         return Position.zero();

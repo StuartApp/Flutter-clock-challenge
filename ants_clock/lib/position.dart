@@ -4,8 +4,6 @@ import 'dart:ui';
 import 'package:ants_clock/math_utils.dart';
 
 class Position {
-  static final _random = Random();
-
   final double x;
 
   final double y;
@@ -18,9 +16,9 @@ class Position {
 
   Position.random(double width, double height)
       : this(
-          _random.nextDouble() * width,
-          _random.nextDouble() * height,
-          _random.nextDouble() * 360.0,
+          random.nextDouble() * width,
+          random.nextDouble() * height,
+          random.nextDouble() * 360.0,
         );
 
   double distanceTo(Position position) {
@@ -49,6 +47,43 @@ class Position {
           return 270.0 - angle;
         }
       }
+    }
+  }
+
+  Position move(double distance, [double bearing]) {
+    bearing ??= this.bearing;
+    if (bearing <= 90.0) {
+      final a = 90.0 - bearing;
+      final xOffset = cos(degToRad(a)) * distance;
+      final yOffset = sin(degToRad(a)) * distance;
+      return copy(
+        x: x + xOffset,
+        y: y - yOffset,
+      );
+    } else if (bearing <= 180.0) {
+      final a = bearing - 90.0;
+      final xOffset = cos(degToRad(a)) * distance;
+      final yOffset = sin(degToRad(a)) * distance;
+      return copy(
+        x: x + xOffset,
+        y: y + yOffset,
+      );
+    } else if (bearing <= 270.0) {
+      final a = 270.0 - bearing;
+      final xOffset = cos(degToRad(a)) * distance;
+      final yOffset = sin(degToRad(a)) * distance;
+      return copy(
+        x: x - xOffset,
+        y: y + yOffset,
+      );
+    } else {
+      final a = bearing - 270.0;
+      final xOffset = cos(degToRad(a)) * distance;
+      final yOffset = sin(degToRad(a)) * distance;
+      return copy(
+        x: x - xOffset,
+        y: y - yOffset,
+      );
     }
   }
 

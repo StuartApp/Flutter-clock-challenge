@@ -17,3 +17,5 @@ double normalizeAngle(double angle) {
     return angle;
   }
 }
+
+final random = Random();

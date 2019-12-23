@@ -8,8 +8,7 @@ class Ant {
 
   int get frame => _frame;
 
-  bool get isMoveFinished =>
-      _positionShifter == null || _positionShifter.isFinished;
+  bool get isAtDestination => _positionShifter?.isFinished ?? true;
 
   static const size = 18.0;
 
@@ -43,7 +42,7 @@ class Ant {
     }
   }
 
-  void setTarget(Position position) {
+  void setDestination(Position position) {
     _positionShifter = PositionShifter(this.position, position);
   }
 }

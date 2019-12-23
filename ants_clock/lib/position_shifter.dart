@@ -55,7 +55,7 @@ class _WalkPositionShifter implements PositionShifter {
 
   bool _isFinished = false;
 
-  _SideShifter _sideShifter = _SideShifter();
+  _LateralStepper _lateralStepper = _LateralStepper();
 
   @override
   Position get position => _position;
@@ -71,7 +71,7 @@ class _WalkPositionShifter implements PositionShifter {
     final elapsedSinceStart = (elapsed - _start).inMilliseconds;
     final t = (elapsedSinceStart / _duration).clamp(0.0, 1.0);
 
-    _position = _sideShifter.shift(
+    _position = _lateralStepper.step(
       elapsed,
       Position(
         _xAnimatable.transform(t),
@@ -89,8 +89,8 @@ class _WalkPositionShifter implements PositionShifter {
   }
 }
 
-class _SideShifter {
-  _SideShifter() {
+class _LateralStepper {
+  _LateralStepper() {
     _reset();
   }
 
@@ -100,7 +100,7 @@ class _SideShifter {
 
   Animatable<double> _animatable;
 
-  Position shift(Duration elapsed, Position position) {
+  Position step(Duration elapsed, Position position) {
     _start ??= elapsed;
 
     final elapsedSinceStart = (elapsed - _start).inMilliseconds;
@@ -121,7 +121,7 @@ class _SideShifter {
     _duration = 50 + random.nextInt(50);
     _animatable = Tween(
       begin: _animatable?.transform(1.0) ?? 0.0,
-      end: random.nextDouble() * 3.0 - 1.5,
+      end: random.nextDouble() * 2.5 - 1.25,
     );
   }
 }

@@ -77,16 +77,15 @@ class ColonyController {
           antIndex = random.nextInt(antsNumber);
         } while (_antDigitPositions.containsKey(antIndex));
         _antDigitPositions[antIndex] = digit.positions[i];
-        ants[antIndex].setTarget(digit.positions[i]);
+        _antBoundaryPositions.remove(antIndex);
+        ants[antIndex].setDestination(digit.positions[i]);
       }
     }
   }
 
   void _assignAntBoundaryPositions() {
-    _antBoundaryPositions.clear();
-
     for (var i = 0; i < ants.length; ++i) {
-      if (!_antDigitPositions.containsKey(i)) {
+      if (!_antDigitPositions.containsKey(i) && ants[i].isAtDestination) {
         _assignAntBoundaryPosition(i);
       }
     }
@@ -105,7 +104,7 @@ class ColonyController {
     } while (_antBoundaryPositions.values.any(isCloseToPosition));
 
     _antBoundaryPositions[antIndex] = position;
-    ants[antIndex].setTarget(position);
+    ants[antIndex].setDestination(position);
   }
 
   Position _createPositionAtBoundary() {

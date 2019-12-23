@@ -78,12 +78,7 @@ class _ColonyState extends State<Colony> with SingleTickerProviderStateMixin {
                 ant.frame == 0 ? 'assets/ant1.png' : 'assets/ant2.png',
                 width: Ant.size,
                 height: Ant.size,
-              )
-              /*Icon(
-                ant.frame == 0 ? Icons.accessibility : Icons.accessibility_new,
-                size: Ant.size,
-              )*/
-              ,
+              ),
             ),
             top: ant.position.y - Ant.halfSize,
             left: ant.position.x - Ant.halfSize,

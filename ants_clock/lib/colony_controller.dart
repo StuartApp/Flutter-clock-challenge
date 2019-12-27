@@ -10,22 +10,22 @@ class ColonyController {
     _minute = minute;
     _shouldRenderTime = true;
 
-    for (var i = 0; i < antsNumber; ++i) {
+    for (var i = 0; i < _antsNumber; ++i) {
       ants.add(Ant(Position.random(worldWidth, worldHeight)));
     }
   }
-
-  static const antsNumber = 60;
-
-  static const boundaryPadding = 10.0;
-
-  static const boundarySize = 20.0;
 
   final double worldWidth;
 
   final double worldHeight;
 
   final List<Ant> ants = [];
+
+  static const _antsNumber = 60;
+
+  static const _boundaryPadding = 10.0;
+
+  static const _boundarySize = 20.0;
 
   int _hour = 0;
 
@@ -74,7 +74,7 @@ class ColonyController {
       for (var i = 0; i < digit.positions.length; ++i) {
         int antIndex;
         do {
-          antIndex = random.nextInt(antsNumber);
+          antIndex = random.nextInt(_antsNumber);
         } while (_antDigitPositions.containsKey(antIndex));
         _antDigitPositions[antIndex] = digit.positions[i];
         _antBoundaryPositions.remove(antIndex);
@@ -111,31 +111,32 @@ class ColonyController {
     switch (random.nextInt(4)) {
       case 0:
         return Position(
-          (random.nextDouble() * boundarySize) + boundaryPadding,
-          (random.nextDouble() * (worldHeight - (boundaryPadding * 2))) +
-              boundaryPadding,
+          (random.nextDouble() * _boundarySize) + _boundaryPadding,
+          (random.nextDouble() * (worldHeight - (_boundaryPadding * 2))) +
+              _boundaryPadding,
           random.nextDouble() * 360.0,
         );
       case 1:
         return Position(
-          (random.nextDouble() * (worldWidth - (boundaryPadding * 2))) +
-              boundaryPadding,
-          (random.nextDouble() * boundarySize) + boundaryPadding,
+          (random.nextDouble() * (worldWidth - (_boundaryPadding * 2))) +
+              _boundaryPadding,
+          (random.nextDouble() * _boundarySize) + _boundaryPadding,
           random.nextDouble() * 360.0,
         );
       case 2:
         return Position(
-          worldWidth - ((random.nextDouble() * boundarySize) + boundaryPadding),
-          (random.nextDouble() * (worldHeight - (boundaryPadding * 2))) +
-              boundaryPadding,
+          worldWidth -
+              ((random.nextDouble() * _boundarySize) + _boundaryPadding),
+          (random.nextDouble() * (worldHeight - (_boundaryPadding * 2))) +
+              _boundaryPadding,
           random.nextDouble() * 360.0,
         );
       case 3:
         return Position(
-          (random.nextDouble() * (worldWidth - (boundaryPadding * 2))) +
-              boundaryPadding,
+          (random.nextDouble() * (worldWidth - (_boundaryPadding * 2))) +
+              _boundaryPadding,
           worldHeight -
-              ((random.nextDouble() * boundarySize) + boundaryPadding),
+              ((random.nextDouble() * _boundarySize) + _boundaryPadding),
           random.nextDouble() * 360.0,
         );
       default:

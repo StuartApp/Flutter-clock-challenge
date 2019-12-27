@@ -50,41 +50,17 @@ class Position {
     }
   }
 
-  Position move(double distance, [double bearing]) {
+  Position offset(double distance, [double bearing]) {
     bearing ??= this.bearing;
-    if (bearing <= 90.0) {
-      final a = 90.0 - bearing;
-      final xOffset = cos(degToRad(a)) * distance;
-      final yOffset = sin(degToRad(a)) * distance;
-      return copy(
-        x: x + xOffset,
-        y: y - yOffset,
-      );
-    } else if (bearing <= 180.0) {
-      final a = bearing - 90.0;
-      final xOffset = cos(degToRad(a)) * distance;
-      final yOffset = sin(degToRad(a)) * distance;
-      return copy(
-        x: x + xOffset,
-        y: y + yOffset,
-      );
-    } else if (bearing <= 270.0) {
-      final a = 270.0 - bearing;
-      final xOffset = cos(degToRad(a)) * distance;
-      final yOffset = sin(degToRad(a)) * distance;
-      return copy(
-        x: x - xOffset,
-        y: y + yOffset,
-      );
-    } else {
-      final a = bearing - 270.0;
-      final xOffset = cos(degToRad(a)) * distance;
-      final yOffset = sin(degToRad(a)) * distance;
-      return copy(
-        x: x - xOffset,
-        y: y - yOffset,
-      );
-    }
+
+    final a = 90.0 - bearing;
+    final xOffset = cos(degToRad(a)) * distance;
+    final yOffset = sin(degToRad(a)) * distance;
+
+    return copy(
+      x: x + xOffset,
+      y: y - yOffset,
+    );
   }
 
   Position copy({

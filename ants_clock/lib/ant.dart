@@ -1,8 +1,13 @@
+import 'package:ants_clock/path_router.dart';
 import 'package:ants_clock/position.dart';
 import 'package:ants_clock/position_shifter.dart';
 
 class Ant {
   Ant(Position position) : _position = position;
+
+  static const size = 18.0;
+
+  static const halfSize = size / 2;
 
   Position get position => _position;
 
@@ -10,9 +15,7 @@ class Ant {
 
   bool get isAtDestination => _positionShifter?.isFinished ?? true;
 
-  static const size = 18.0;
-
-  static const halfSize = size / 2;
+  BoundingBox get boundingBox => BoundingBox.fromAnt(this);
 
   static const _framesPerSecond = 30.0;
 

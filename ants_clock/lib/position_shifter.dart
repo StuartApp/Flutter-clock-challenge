@@ -106,7 +106,7 @@ class _LateralStepper {
     final elapsedSinceStart = (elapsed - _start).inMilliseconds;
     final t = (elapsedSinceStart / _duration).clamp(0.0, 1.0);
 
-    var movedPosition = position.move(
+    var movedPosition = position.offset(
       _animatable.transform(t),
       normalizeAngle(position.bearing + 90.0),
     );
@@ -122,7 +122,7 @@ class _LateralStepper {
     _animatable = Tween(
       begin: _animatable?.transform(1.0) ?? 0.0,
       end: random.nextDouble() * 2.5 - 1.25,
-    );
+    ).chain(CurveTween(curve: Curves.easeInOut));
   }
 }
 

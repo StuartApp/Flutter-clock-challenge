@@ -3,7 +3,9 @@
 // found in the LICENSE file.
 
 import 'dart:io';
+import 'dart:math';
 
+import 'package:ants_clock/path_router.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_clock_helper/customizer.dart';
@@ -22,4 +24,8 @@ void main() {
   }
 
   runApp(ClockCustomizer((ClockModel model) => AntsClock(model)));
+
+  final c = BoundingCircle(Point(0.0, 1.0), 1.0);
+  final p = c.getTangentIntersectionPoint(Point(1.5, 1.0));
+  print('p = $p');
 }

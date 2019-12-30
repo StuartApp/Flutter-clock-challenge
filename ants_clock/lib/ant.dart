@@ -15,7 +15,7 @@ class Ant {
 
   bool get isAtDestination => _positionShifter?.isFinished ?? true;
 
-  BoundingBox get boundingBox => BoundingBox.fromAnt(this);
+  BoundingCircle get boundingCircle => BoundingCircle.fromAnt(this);
 
   static const _framesPerSecond = 30.0;
 

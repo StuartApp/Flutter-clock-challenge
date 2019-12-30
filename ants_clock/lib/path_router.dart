@@ -13,28 +13,29 @@ class BoundingCircle {
     return BoundingCircle(Point(ant.position.x, ant.position.y), Ant.size);
   }
 
+  final _random = Random();
+
+  /// It can return Point(NaN, NaN) if [point] is inside the circle
   Point<double> getTangentIntersectionPoint(Point<double> point) {
+    // Given circle formula
+    // x^2 + y^2 = r^2
+
+    // And gradient bla bla bla
+    // And gradient 2 bla bla bla
+
     // Let circle center be 0,0
-    // a^2 + b^2 = radius^2
-
-    // 9a^2 + (4 - 5a)^2 - 36 = 0
-    // -> 16 - 20a - 20a + 25a^2
-    // 34a^2 -40a - 20 = 0
-
-    // a^2 + ((radius^2 - x * a) / y)^2 = radius^2
-    // a^2 + ((radius^2 - x * a)^2 / y^2) = radius^2
-    // y^2 * a^2 + (radius^2 - x * a)^2 = radius^2 * y^2
-    // y^2 * a^2 + (radius^2 - x * a)^2 - (radius^2 * y^2) = 0
-    // y^2 * a^2 + radius^4 - (radius^2 * x)a - (radius^2 * x)a + x^2 * a^2 - (radius^2 * y^2) = 0
-    // y^2 * a^2 + x^2 * a^2 - (radius^2 * x)a - (radius^2 * x)a - (radius^2 * y^2) + radius^4 = 0
-
     final p = point - center;
+
+    // Quadratic equation formula parameters
     final a = pow(p.x, 2) + pow(p.y, 2);
     final b = -2 * (pow(radius, 2) * p.x);
     final c = pow(radius, 4) - (pow(radius, 2) * pow(p.y, 2));
 
-    final x = (-b + sqrt(pow(b, 2) - 4 * a * c)) / (2 * a);
-    final y = p.y != 0 ? (pow(radius, 2) - x * p.x) / p.y : sqrt(pow(radius, 2) - pow(x, 2));
+    final sign = _random.nextInt(2) == 0 ? 1 : -1;
+    final x = (-b + sign * sqrt(pow(b, 2) - 4 * a * c)) / (2 * a);
+    final y = p.y != 0.0
+        ? (pow(radius, 2) - x * p.x) / p.y
+        : sign * sqrt(pow(radius, 2) - pow(x, 2));
 
     return Point(x, y) + center;
   }

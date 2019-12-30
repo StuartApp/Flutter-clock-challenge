@@ -25,7 +25,7 @@ void main() {
 
   runApp(ClockCustomizer((ClockModel model) => AntsClock(model)));
 
-  final c = BoundingCircle(Point(0.0, 1.0), 1.0);
-  final p = c.getTangentIntersectionPoint(Point(1.5, 1.0));
+  final c = BoundingCircle(Point(0.0, 0.0), 1.0);
+  final p = c.getTangentIntersectionPoint(Point(2.0, -1.0));
   print('p = $p');
 }

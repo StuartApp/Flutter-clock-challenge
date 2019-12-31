@@ -1,6 +1,37 @@
 import 'dart:math';
 
+import 'package:ants_clock/position.dart';
+
 import 'ant.dart';
+
+class PathRouter {
+  final List<Ant> _ants;
+
+  PathRouter(this._ants);
+
+  List<Position> route(Ant traveller, Position position) {
+    final route = <Position>[];
+
+    final segment = Segment(
+      traveller.position.toPoint(),
+      position.toPoint(),
+    );
+
+    for (var ant in _ants) {
+      if (ant != traveller) {
+        if (segment.intersectsWithBoundingCircle(ant.boundingCircle)) {
+          final point = ant.boundingCircle
+              .getTangentIntersectionPoint(traveller.position.toPoint());
+          route.add(Position(point.x, point.y, 0.0));
+        }
+      }
+    }
+
+    route.add(position);
+
+    return route;
+  }
+}
 
 class BoundingCircle {
   final Point<double> center;
@@ -17,6 +48,10 @@ class BoundingCircle {
 
   /// It can return Point(NaN, NaN) if [point] is inside the circle
   Point<double> getTangentIntersectionPoint(Point<double> point) {
+    if (point.distanceTo(center) < radius) {
+      return center;
+    }
+
     // Given circle formula
     // x^2 + y^2 = r^2
 
@@ -31,8 +66,11 @@ class BoundingCircle {
     final b = -2 * (pow(radius, 2) * p.x);
     final c = pow(radius, 4) - (pow(radius, 2) * pow(p.y, 2));
 
+    print('a $a b $b c $c');
+
     final sign = _random.nextInt(2) == 0 ? 1 : -1;
     final x = (-b + sign * sqrt(pow(b, 2) - 4 * a * c)) / (2 * a);
+    print('x $x');
     final y = p.y != 0.0
         ? (pow(radius, 2) - x * p.x) / p.y
         : sign * sqrt(pow(radius, 2) - pow(x, 2));
@@ -85,38 +123,7 @@ class Segment {
     return distance <= circle.radius;
   }
 
-  /*bool intersects(Segment other) {
-    if (!rectangle.intersects(other.rectangle)) return false;
-
-    Point<double> intersectionPoint = _calcIntersectionPoint(other);
-
-    return rectangle.containsPoint(intersectionPoint) &&
-        other.rectangle.containsPoint(intersectionPoint);
-  }*/
-
-  /*Point<double> _calcIntersectionPoint(Segment other) {
-    final a1 = (end.y - begin.y) / (end.x - begin.x);
-    final b1 = -((begin.x * a1) - begin.y);
-
-    final a2 = (other.end.y - other.begin.y) / (other.end.x - other.begin.x);
-    final b2 = -((other.begin.x * a2) - other.begin.y);
-
-    final x = (b2 - b1) / (a1 - a2);
-    final y = (a1 * x) + b2;
-
-    return Point(x, y);
-  }*/
-
   bool _isLinePointInsideSegment(Point point) {
     return Rectangle.fromPoints(begin, end).containsPoint(point);
   }
 }
-
-/*class BoundingBox {
-  final Segment top;
-  final Segment left;
-  final Segment right;
-  final Segment bottom;
-
-  BoundingBox(this.top, this.left, this.right, this.bottom);
-}*/

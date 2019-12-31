@@ -1,4 +1,5 @@
 import 'package:ants_clock/digit.dart';
+import 'package:ants_clock/path_router.dart';
 import 'package:ants_clock/position.dart';
 
 import 'ant.dart';
@@ -10,9 +11,22 @@ class ColonyController {
     _minute = minute;
     _shouldRenderTime = true;
 
-    for (var i = 0; i < _antsNumber; ++i) {
+    final pathRouter = PathRouter(ants);
+
+    // DBG
+    ants.add(Ant(
+      Position(30.0, worldHeight / 2.0, 0.0),
+      pathRouter,
+    ));
+
+    ants.add(Ant(
+      Position(300.0, worldHeight / 2.0, 0.0),
+      pathRouter,
+    ));
+
+    /*for (var i = 0; i < _antsNumber; ++i) {
       ants.add(Ant(Position.random(worldWidth, worldHeight)));
-    }
+    }*/
   }
 
   final double worldWidth;
@@ -48,7 +62,18 @@ class ColonyController {
   void tick(Duration elapsed) {
     _elapsed ??= elapsed;
 
-    if (_shouldRenderTime) {
+    // DBG
+
+    if (ants.first.isAtDestination &&
+        ants.first.position.x < worldWidth - 30.0) {
+      ants.first.setDestination(Position(
+        worldWidth - 30.0,
+        worldHeight / 2.0,
+        0.0,
+      ));
+    }
+
+    /*if (_shouldRenderTime) {
       _assignAntDigitPositions(_hour, _minute);
       _assignAntBoundaryPositions();
       _shouldRenderTime = false;
@@ -56,7 +81,7 @@ class ColonyController {
       final antIndexList = _antBoundaryPositions.keys.toList();
       final antIndex = antIndexList[random.nextInt(antIndexList.length)];
       _assignAntBoundaryPosition(antIndex);
-    }
+    }*/
 
     for (var ant in ants) {
       ant.move(elapsed);

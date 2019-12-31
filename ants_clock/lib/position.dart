@@ -63,6 +63,10 @@ class Position {
     );
   }
 
+  Point<double> toPoint() {
+    return Point(x, y);
+  }
+
   Position copy({
     double x,
     double y,

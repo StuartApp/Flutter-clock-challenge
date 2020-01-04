@@ -3,7 +3,7 @@ import 'package:ants_clock/position.dart';
 import 'package:ants_clock/position_shifter.dart';
 
 class Ant {
-  Ant(Position position, this._pathRouter) : _position = position;
+  Ant(Position position) : _position = position;
 
   static const size = 18.0;
 
@@ -15,11 +15,11 @@ class Ant {
 
   bool get isAtDestination => _positionShifter?.isFinished ?? true;
 
-  BoundingCircle get boundingCircle => BoundingCircle.fromAnt(this);
+  BoundingBox get boundingBox => BoundingBox.fromAnt(this);
+
+  // BoundingCircle get boundingCircle => BoundingCircle.fromAnt(this);
 
   static const _framesPerSecond = 30.0;
-
-  final PathRouter _pathRouter;
 
   Position _position;
 
@@ -55,7 +55,7 @@ class Ant {
   }
 
   void setDestination(Position position) {
-    _route = _pathRouter.route(this, position);
+    _route = [position];
     _positionShifter = PositionShifter(this.position, _route.first);
     _route.removeAt(0);
   }

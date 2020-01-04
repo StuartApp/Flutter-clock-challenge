@@ -3,79 +3,70 @@ import 'dart:math';
 import 'package:ants_clock/position.dart';
 
 import 'ant.dart';
+import 'math_utils.dart';
 
 class PathRouter {
   final List<Ant> _ants;
 
   PathRouter(this._ants);
 
-  List<Position> route(Ant traveller, Position position) {
+  List<Position> route(Ant traveller, Position destination) {
     final route = <Position>[];
 
     final segment = Segment(
       traveller.position.toPoint(),
-      position.toPoint(),
+      destination.toPoint(),
     );
 
     for (var ant in _ants) {
       if (ant != traveller) {
-        if (segment.intersectsWithBoundingCircle(ant.boundingCircle)) {
-          final point = ant.boundingCircle
-              .getTangentIntersectionPoint(traveller.position.toPoint());
-          route.add(Position(point.x, point.y, 0.0));
+        final intersection =
+            segment.getBoundingBoxIntersection(ant.boundingBox);
+        if (intersection != null) {
+          final point = intersection.segment.begin;
+          route.add(traveller.position.positionToPoint(point));
         }
       }
     }
 
-    route.add(position);
+    route.add(destination);
 
     return route;
   }
 }
 
-class BoundingCircle {
-  final Point<double> center;
+class BoundingBox {
+  final Segment top;
+  final Segment right;
+  final Segment bottom;
+  final Segment left;
 
-  final double radius;
+  BoundingBox(this.top, this.right, this.bottom, this.left);
 
-  BoundingCircle(this.center, this.radius);
+  factory BoundingBox.fromAnt(Ant ant) {
+    final topLeft = _getRotatedAntPoint(ant, -Ant.halfSize, -Ant.halfSize);
+    final topRight = _getRotatedAntPoint(ant, Ant.halfSize, -Ant.halfSize);
+    final bottomLeft = _getRotatedAntPoint(ant, -Ant.halfSize, Ant.halfSize);
+    final bottomRight = _getRotatedAntPoint(ant, Ant.halfSize, Ant.halfSize);
 
-  factory BoundingCircle.fromAnt(Ant ant) {
-    return BoundingCircle(Point(ant.position.x, ant.position.y), Ant.size);
+    return BoundingBox(
+      Segment(topLeft, topRight),
+      Segment(topRight, bottomRight),
+      Segment(bottomRight, bottomLeft),
+      Segment(bottomLeft, topLeft),
+    );
   }
 
-  final _random = Random();
-
-  /// It can return Point(NaN, NaN) if [point] is inside the circle
-  Point<double> getTangentIntersectionPoint(Point<double> point) {
-    if (point.distanceTo(center) < radius) {
-      return center;
-    }
-
-    // Given circle formula
-    // x^2 + y^2 = r^2
-
-    // And gradient bla bla bla
-    // And gradient 2 bla bla bla
-
-    // Let circle center be 0,0
-    final p = point - center;
-
-    // Quadratic equation formula parameters
-    final a = pow(p.x, 2) + pow(p.y, 2);
-    final b = -2 * (pow(radius, 2) * p.x);
-    final c = pow(radius, 4) - (pow(radius, 2) * pow(p.y, 2));
-
-    print('a $a b $b c $c');
-
-    final sign = _random.nextInt(2) == 0 ? 1 : -1;
-    final x = (-b + sign * sqrt(pow(b, 2) - 4 * a * c)) / (2 * a);
-    print('x $x');
-    final y = p.y != 0.0
-        ? (pow(radius, 2) - x * p.x) / p.y
-        : sign * sqrt(pow(radius, 2) - pow(x, 2));
-
-    return Point(x, y) + center;
+  static Point<double> _getRotatedAntPoint(
+      Ant ant, double xOffset, double yOffset) {
+    return rotatePoint(
+      Point(
+        ant.position.x + xOffset,
+        ant.position.y + yOffset,
+      ),
+      ant.position.toPoint(),
+      ant.position.bearing,
+    );
   }
 }
 
@@ -88,42 +79,48 @@ class Segment {
 
   Segment(this.begin, this.end) : rectangle = Rectangle.fromPoints(begin, end);
 
-  bool intersectsWithBoundingCircle(BoundingCircle circle) {
-    // Having line formula as: y = x * a + b
+  Point<double> getSegmentIntersection(Segment other) {
+    if (!rectangle.intersects(other.rectangle)) return null;
 
-    // Segment line formula params
+    Point<double> intersectionPoint = _calcIntersectionPoint(other);
+
+    return rectangle.containsPoint(intersectionPoint) &&
+            other.rectangle.containsPoint(intersectionPoint)
+        ? intersectionPoint
+        : null;
+  }
+
+  BoundingBoxIntersection getBoundingBoxIntersection(BoundingBox boundingBox) {
+    BoundingBoxIntersection createBoundingBoxIntersection(Segment segment) {
+      final intersection = getSegmentIntersection(segment);
+      return intersection != null
+          ? BoundingBoxIntersection(segment, intersection)
+          : null;
+    }
+
+    return createBoundingBoxIntersection(boundingBox.top) ??
+        createBoundingBoxIntersection(boundingBox.right) ??
+        createBoundingBoxIntersection(boundingBox.bottom) ??
+        createBoundingBoxIntersection(boundingBox.left);
+  }
+
+  Point<double> _calcIntersectionPoint(Segment other) {
     final a1 = (end.y - begin.y) / (end.x - begin.x);
     final b1 = -((begin.x * a1) - begin.y);
 
-    // Intersection point of segment with perpendicular line from segment to
-    // circle center
-    double x;
-    double y;
+    final a2 = (other.end.y - other.begin.y) / (other.end.x - other.begin.x);
+    final b2 = -((other.begin.x * a2) - other.begin.y);
 
-    if (a1 == 0.0) {
-      // Segment is an horizontal line so perpendicular line will be vertical
-      x = circle.center.x;
-      y = begin.y;
-    } else {
-      // Perpendicular line from segment to circle center formula params
-      final a2 = a1 != 0.0 ? -1.0 / a1 : 1.0;
-      final b2 = -((circle.center.x * a2) - circle.center.y);
+    final x = (b2 - b1) / (a1 - a2);
+    final y = (a1 * x) + b2;
 
-      x = (b2 - b1) / (a1 - a2);
-      y = (a1 * x) + b1;
-    }
-
-    if (!_isLinePointInsideSegment(Point(x, y))) return false;
-
-    // Distance from intersection point to circle center
-    final dx = circle.center.x - x;
-    final dy = circle.center.y - y;
-    final distance = sqrt(dx * dx + dy * dy);
-
-    return distance <= circle.radius;
+    return Point(x, y);
   }
+}
 
-  bool _isLinePointInsideSegment(Point point) {
-    return Rectangle.fromPoints(begin, end).containsPoint(point);
-  }
+class BoundingBoxIntersection {
+  final Segment segment;
+  final Point<double> intersection;
+
+  BoundingBoxIntersection(this.segment, this.intersection);
 }

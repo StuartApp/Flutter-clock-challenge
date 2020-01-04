@@ -1,5 +1,4 @@
 import 'package:ants_clock/digit.dart';
-import 'package:ants_clock/path_router.dart';
 import 'package:ants_clock/position.dart';
 
 import 'ant.dart';
@@ -11,18 +10,9 @@ class ColonyController {
     _minute = minute;
     _shouldRenderTime = true;
 
-    final pathRouter = PathRouter(ants);
-
     // DBG
-    ants.add(Ant(
-      Position(30.0, worldHeight / 2.0, 0.0),
-      pathRouter,
-    ));
-
-    ants.add(Ant(
-      Position(300.0, worldHeight / 2.0, 0.0),
-      pathRouter,
-    ));
+    ants.add(Ant(Position(30.0, worldHeight / 2.0, 0.0)));
+    ants.add(Ant(Position(300.0, worldHeight / 2.0, 0.0)));
 
     /*for (var i = 0; i < _antsNumber; ++i) {
       ants.add(Ant(Position.random(worldWidth, worldHeight)));

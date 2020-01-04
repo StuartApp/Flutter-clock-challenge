@@ -50,6 +50,11 @@ class Position {
     }
   }
 
+  Position positionToPoint(Point<double> point) {
+    final tmpPosition = Position(point.x, point.y, 0.0);
+    return Position(point.x, point.y, bearingTo(tmpPosition));
+  }
+
   Position offset(double distance, [double bearing]) {
     bearing ??= this.bearing;
 

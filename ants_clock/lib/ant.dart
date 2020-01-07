@@ -17,8 +17,6 @@ class Ant {
 
   BoundingBox get boundingBox => BoundingBox.fromAnt(this);
 
-  // BoundingCircle get boundingCircle => BoundingCircle.fromAnt(this);
-
   static const _framesPerSecond = 30.0;
 
   Position _position;
@@ -54,8 +52,8 @@ class Ant {
     }
   }
 
-  void setDestination(Position position) {
-    _route = [position];
+  void setRoute(List<Position> route) {
+    _route = route;
     _positionShifter = PositionShifter(this.position, _route.first);
     _route.removeAt(0);
   }

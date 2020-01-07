@@ -1,4 +1,5 @@
 import 'package:ants_clock/digit.dart';
+import 'package:ants_clock/path_router.dart';
 import 'package:ants_clock/position.dart';
 
 import 'ant.dart';
@@ -10,9 +11,22 @@ class ColonyController {
     _minute = minute;
     _shouldRenderTime = true;
 
-    // DBG
+    // DBG BEGIN
+
     ants.add(Ant(Position(30.0, worldHeight / 2.0, 0.0)));
-    ants.add(Ant(Position(300.0, worldHeight / 2.0, 0.0)));
+
+    /*for (var i = 0; i < 10; ++i) {
+      ants.add(Ant(Position(
+        250.0 + ((random.nextDouble() * 200.0) - 100.0),
+        worldHeight / 2.0 + ((random.nextDouble() * 200.0) - 100.0),
+        0.0,
+      )));
+    }*/
+
+    ants.add(Ant(Position(250.0, worldHeight / 2.0, 0.0)));
+    ants.add(Ant(Position(280.0, worldHeight / 2.0 - 10.0, 0.0)));
+
+    // DBG END
 
     /*for (var i = 0; i < _antsNumber; ++i) {
       ants.add(Ant(Position.random(worldWidth, worldHeight)));
@@ -43,6 +57,8 @@ class ColonyController {
 
   final _antBoundaryPositions = <int, Position>{};
 
+  final _pathRouter = PathRouter();
+
   void setTime(int hour, int minute) {
     _hour = hour;
     _minute = minute;
@@ -53,14 +69,18 @@ class ColonyController {
     _elapsed ??= elapsed;
 
     // DBG
-
     if (ants.first.isAtDestination &&
         ants.first.position.x < worldWidth - 30.0) {
-      ants.first.setDestination(Position(
-        worldWidth - 30.0,
-        worldHeight / 2.0,
-        0.0,
-      ));
+      final route = _pathRouter.route(
+          ants.first,
+          ants,
+          Position(
+            worldWidth - 30.0,
+            worldHeight / 2.0,
+            0.0,
+          ));
+
+      ants.first.setRoute(route);
     }
 
     /*if (_shouldRenderTime) {
@@ -93,7 +113,7 @@ class ColonyController {
         } while (_antDigitPositions.containsKey(antIndex));
         _antDigitPositions[antIndex] = digit.positions[i];
         _antBoundaryPositions.remove(antIndex);
-        ants[antIndex].setDestination(digit.positions[i]);
+        ants[antIndex].setRoute([digit.positions[i]]);
       }
     }
   }
@@ -119,7 +139,7 @@ class ColonyController {
     } while (_antBoundaryPositions.values.any(isCloseToPosition));
 
     _antBoundaryPositions[antIndex] = position;
-    ants[antIndex].setDestination(position);
+    ants[antIndex].setRoute([position]);
   }
 
   Position _createPositionAtBoundary() {

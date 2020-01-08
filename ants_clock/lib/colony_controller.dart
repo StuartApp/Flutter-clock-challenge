@@ -23,8 +23,9 @@ class ColonyController {
       )));
     }*/
 
-    ants.add(Ant(Position(250.0, worldHeight / 2.0, 0.0)));
-    ants.add(Ant(Position(280.0, worldHeight / 2.0 - 10.0, 0.0)));
+    ants.add(Ant(Position(200.0 + 0, worldHeight / 2.0 - 12, 0.0)));
+    ants.add(Ant(Position(200.0 + 0, worldHeight / 2.0 + 12, 0.0)));
+    ants.add(Ant(Position(200.0 + 100, worldHeight / 2.0 + 0, 0.0)));
 
     // DBG END
 
@@ -90,7 +91,7 @@ class ColonyController {
     } else if (random.nextInt(100) == 0) {
       final antIndexList = _antBoundaryPositions.keys.toList();
       final antIndex = antIndexList[random.nextInt(antIndexList.length)];
-      _assignAntBoundaryPosition(antIndex);
+      _assignAntBoundaryPosition(antIndex, skipAnts: true);
     }*/
 
     for (var ant in ants) {
@@ -126,7 +127,7 @@ class ColonyController {
     }
   }
 
-  void _assignAntBoundaryPosition(int antIndex) {
+  void _assignAntBoundaryPosition(int antIndex, {bool skipAnts = false}) {
     _antBoundaryPositions.remove(antIndex);
 
     Position position;
@@ -138,8 +139,16 @@ class ColonyController {
       position = _createPositionAtBoundary();
     } while (_antBoundaryPositions.values.any(isCloseToPosition));
 
+    List<Position> route;
+
+    if (skipAnts) {
+      route = _pathRouter.route(ants[antIndex], ants, position);
+    } else {
+      route = [position];
+    }
+
     _antBoundaryPositions[antIndex] = position;
-    ants[antIndex].setRoute([position]);
+    ants[antIndex].setRoute(route);
   }
 
   Position _createPositionAtBoundary() {

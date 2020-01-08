@@ -1,5 +1,6 @@
 import 'dart:math';
 
+import 'package:ants_clock/pair.dart';
 import 'package:ants_clock/position.dart';
 
 import 'ant.dart';
@@ -29,6 +30,8 @@ class PathRouter {
     } while (intersection != null);
 
     route.add(destination);
+
+    _simplifyRoute(route);
 
     return route;
   }
@@ -65,6 +68,15 @@ class PathRouter {
     return closestIntersection;
   }
 
+  List<Point<double>> _getAdjacentSegmentsVertices(
+    List<Ant> ants,
+    BoundingBox boundingBox,
+    BoundingBoxSegment boundingBoxSegment,
+  ) {
+    final segment = boundingBox.getSegment(boundingBoxSegment);
+    segment.getBoundingBoxIntersection(boundingBox);
+  }
+
   void _walkAroundBoundingBox(
     List<Position> route,
     Position begin,
@@ -94,6 +106,11 @@ class PathRouter {
       currentVertex = vertices.first;
       currentDistance = currentVertex.squaredDistanceTo(endPoint);
     }
+  }
+
+  void _simplifyRoute(List<Position> route) {
+    // route.removeAt(0);
+    // for (var i = route.length - 1; i >= 0; --i) {}
   }
 }
 
@@ -191,6 +208,134 @@ class BoundingBox {
 
 enum BoundingBoxSegment { top, right, bottom, left }
 
+class BoundingShape {
+  static const padding = 5.0;
+
+  final List<Segment> segments;
+
+  final Rectangle bounds;
+
+  BoundingShape(this.segments) : bounds = _createRectangle(segments);
+
+  factory BoundingShape.fromAnt(Ant ant) {
+    final offset = Ant.halfSize + padding;
+    final topLeft = _getRotatedAntPoint(ant, -offset, -offset);
+    final topRight = _getRotatedAntPoint(ant, offset, -offset);
+    final bottomLeft = _getRotatedAntPoint(ant, -offset, offset);
+    final bottomRight = _getRotatedAntPoint(ant, offset, offset);
+
+    return BoundingShape([
+      Segment(topLeft, topRight),
+      Segment(topRight, bottomRight),
+      Segment(bottomRight, bottomLeft),
+      Segment(bottomLeft, topLeft),
+    ]);
+  }
+
+  bool intersects(BoundingShape other) {
+    if (!bounds.intersects(other.bounds)) return false;
+
+    for (var segment in segments) {
+      for (var otherSegment in other.segments) {
+        if (segment.getSegmentIntersection(otherSegment) != null) return true;
+      }
+    }
+
+    return false;
+  }
+
+  BoundingShape union(BoundingShape other) {
+    final newSegments = <Segment>[];
+
+    final thisIterator = _SegmentsIterator(segments);
+    final otherIterator = _SegmentsIterator(other.segments);
+
+    var usingThisIterator = true;
+    var currentIterator = thisIterator;
+    var followingIterator = otherIterator;
+
+    final firstPoint = segments.first.begin;
+
+    while (currentIterator.currentSegment.end != firstPoint) {
+      final pair = _findIntersectingSegment(
+        currentIterator.currentSegment,
+        followingIterator.segments,
+      );
+
+      if (pair == null) {
+        newSegments.add(currentIterator.currentSegment);
+        currentIterator.next();
+      } else {
+        followingIterator.setCurrentIndex(pair.first);
+
+        newSegments.add(Segment(
+          currentIterator.currentSegment.begin,
+          pair.last,
+        ));
+
+        newSegments.add(Segment(
+          pair.last,
+          followingIterator.currentSegment.end,
+        ));
+
+        followingIterator.next();
+
+        if (usingThisIterator) {
+          usingThisIterator = false;
+          currentIterator = otherIterator;
+          followingIterator = thisIterator;
+        } else {
+          usingThisIterator = true;
+          currentIterator = thisIterator;
+          followingIterator = otherIterator;
+        }
+      }
+    }
+
+    newSegments.add(currentIterator.currentSegment);
+
+    return BoundingShape(newSegments);
+  }
+
+  Pair<int, Point<double>> _findIntersectingSegment(
+      Segment segment, List<Segment> segments) {
+    for (var i = 0; i < segments.length; ++i) {
+      var s = segments[i];
+      final intersection = segment.getSegmentIntersection(s);
+      if (intersection != null) {
+        return Pair(i, intersection);
+      }
+    }
+    return null;
+  }
+
+  static Rectangle _createRectangle(List<Segment> segments) {
+    double top;
+    double right;
+    double bottom;
+    double left;
+    for (var s in segments) {
+      top = min(top ?? s.begin.y, min(s.begin.y, s.end.y));
+      right = max(right ?? s.begin.x, max(s.begin.x, s.end.x));
+      bottom = max(bottom ?? s.begin.y, max(s.begin.y, s.end.y));
+      left = min(left ?? s.begin.x, min(s.begin.x, s.end.x));
+    }
+    return Rectangle.fromPoints(Point(left, top), Point(right, bottom));
+  }
+
+  static Point<double> _getRotatedAntPoint(
+      Ant ant, double xOffset, double yOffset) {
+    return rotatePoint(
+      Point(
+        ant.position.x + xOffset,
+        ant.position.y + yOffset,
+      ),
+      ant.position.toPoint(),
+      ant.position.bearing,
+    );
+  }
+}
+
 class BoundingBoxIntersection {
   final BoundingBox boundingBox;
   final BoundingBoxSegment boundingBoxSegment;
@@ -284,5 +429,25 @@ class Segment {
     }
 
     return Point(x, y);
+  }
+}
+
+class _SegmentsIterator {
+  final List<Segment> segments;
+  var _currentIndex = 0;
+
+  _SegmentsIterator(this.segments);
+
+  Segment get currentSegment => segments[_currentIndex];
+
+  void next() {
+    _currentIndex++;
+    if (_currentIndex == segments.length) {
+      _currentIndex = 0;
+    }
+  }
+
+  void setCurrentIndex(int index) {
+    _currentIndex = index.clamp(0, segments.length - 1);
   }
 }

@@ -114,7 +114,9 @@ void main() {
       expect(boundingShape.segments[3].end.y, 100.0 - offset);
     });
 
-    test('Union of two bounding shapes', () {
+    test(
+        'Union of two bounding shapes '
+        '(2nd square overlaps right side of 1st square)', () {
       final bs1 = BoundingShape([
         Segment(Point(1.0, 1.0), Point(3.0, 1.0)),
         Segment(Point(3.0, 1.0), Point(3.0, 3.0)),
@@ -132,6 +134,52 @@ void main() {
       final result = bs1.union(bs2);
 
       expect(result.segments.length, 8);
+      expect(result.segments.first.begin, result.segments.last.end);
+    });
+
+    test(
+        'Union of two bounding shapes '
+        '(2nd square overlaps left side of 1st square)', () {
+      final bs1 = BoundingShape.fromPoints([
+        Point(1.0, 0.0),
+        Point(3.0, 0.0),
+        Point(3.0, 3.0),
+        Point(1.0, 3.0),
+      ]);
+
+      final bs2 = BoundingShape.fromPoints([
+        Point(0.0, 1.0),
+        Point(2.0, 1.0),
+        Point(2.0, 2.0),
+        Point(0.0, 2.0),
+      ]);
+
+      final result = bs1.union(bs2);
+
+      expect(result.segments.length, 8);
+      expect(result.segments.first.begin, result.segments.last.end);
+    });
+
+    test(
+        'Union of two bounding shapes '
+        '(2nd square is on the right side of 1st square)', () {
+      final bs1 = BoundingShape.fromPoints([
+        Point(0.0, 0.0),
+        Point(1.0, 0.0),
+        Point(1.0, 1.0),
+        Point(0.0, 1.0),
+      ]);
+
+      final bs2 = BoundingShape.fromPoints([
+        Point(1.0, 0.0),
+        Point(2.0, 0.0),
+        Point(2.0, 1.0),
+        Point(1.0, 1.0),
+      ]);
+
+      final result = bs1.union(bs2);
+
+      expect(result.segments.length, 6);
       expect(result.segments.first.begin, result.segments.last.end);
     });
   });

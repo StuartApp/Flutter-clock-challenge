@@ -30,4 +30,36 @@ void main() {
     expect(result.x, closeTo(2.0, 0.1));
     expect(result.y, closeTo(0.0, 0.1));
   });
+
+  group('Counter clockwise vectors angle', () {
+    test('180', () {
+      final angle =
+          ccwVectorsAngle(Point(1.0, 1.0), Point(1.0, 0.0), Point(1.0, 2.0));
+      expect(angle, 180.0);
+    });
+
+    test('90', () {
+      final angle =
+          ccwVectorsAngle(Point(1.0, 1.0), Point(1.0, 0.0), Point(0.0, 1.0));
+      expect(angle, 90.0);
+    });
+
+    test('270', () {
+      final angle =
+          ccwVectorsAngle(Point(1.0, 1.0), Point(1.0, 0.0), Point(2.0, 1.0));
+      expect(angle, 270.0);
+    });
+
+    test('270', () {
+      final angle =
+          ccwVectorsAngle(Point(1.0, 3.0), Point(0.0, 3.0), Point(1.0, 2.0));
+      expect(angle, 270.0);
+    });
+
+    test('0', () {
+      final angle =
+          ccwVectorsAngle(Point(1.0, 2.0), Point(1.0, 3.0), Point(1.0, 4.0));
+      expect(angle, 0.0);
+    });
+  });
 }

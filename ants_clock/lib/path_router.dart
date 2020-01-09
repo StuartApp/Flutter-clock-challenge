@@ -1,6 +1,5 @@
 import 'dart:math';
 
-import 'package:ants_clock/pair.dart';
 import 'package:ants_clock/position.dart';
 
 import 'ant.dart';
@@ -232,6 +231,17 @@ class BoundingShape {
     ]);
   }
 
+  factory BoundingShape.fromPoints(List<Point<double>> points) {
+    final segments = <Segment>[];
+
+    for (var i = 0; i < points.length; ++i) {
+      int j = i < points.length - 1 ? i + 1 : 0;
+      segments.add(Segment(points[i], points[j]));
+    }
+
+    return BoundingShape(segments);
+  }
+
   bool intersects(BoundingShape other) {
     if (!bounds.intersects(other.bounds)) return false;
 
@@ -245,68 +255,106 @@ class BoundingShape {
   }
 
   BoundingShape union(BoundingShape other) {
-    final newSegments = <Segment>[];
+    final thisShapeVertices = _getShapeVertices(other);
+    final otherShapeVertices = other._getShapeVertices(this);
 
-    final thisIterator = _SegmentsIterator(segments);
-    final otherIterator = _SegmentsIterator(other.segments);
+    _linkVertices(thisShapeVertices);
+    _linkVertices(otherShapeVertices);
+    _linkCommonVertices(thisShapeVertices, otherShapeVertices);
 
-    var usingThisIterator = true;
-    var currentIterator = thisIterator;
-    var followingIterator = otherIterator;
+    final initialVertex = _findInitialBottomVertex(thisShapeVertices);
+    _Vertex currentVertex = initialVertex;
+    _Vertex previousVertex = _Vertex(initialVertex.point - Point(1.0, 0.0));
 
-    final firstPoint = segments.first.begin;
+    final points = <Point<double>>[];
 
-    while (currentIterator.currentSegment.end != firstPoint) {
-      final pair = _findIntersectingSegment(
-        currentIterator.currentSegment,
-        followingIterator.segments,
-      );
+    while (currentVertex != initialVertex || !currentVertex.isVisited) {
+      points.add(currentVertex.point);
+      _Vertex nextVertex =
+          _findLeftmostLinkedVertex(currentVertex, previousVertex);
+      previousVertex = currentVertex;
+      currentVertex.markAsVisited();
+      currentVertex = nextVertex;
+    }
 
-      if (pair == null) {
-        newSegments.add(currentIterator.currentSegment);
-        currentIterator.next();
-      } else {
-        followingIterator.setCurrentIndex(pair.first);
+    return BoundingShape.fromPoints(points);
+  }
 
-        newSegments.add(Segment(
-          currentIterator.currentSegment.begin,
-          pair.last,
-        ));
+  List<_Vertex> _getShapeVertices(BoundingShape other) {
+    final vertices = <_Vertex>[];
+    for (var segment in segments) {
+      final points = _findIntersections(segment, other);
+      vertices.addAll(points.map((p) => _Vertex(p)));
+      vertices.add(_Vertex(segment.end));
+    }
+    return vertices;
+  }
 
-        newSegments.add(Segment(
-          pair.last,
-          followingIterator.currentSegment.end,
-        ));
+  List<Point<double>> _findIntersections(Segment segment, BoundingShape other) {
+    final points = <Point<double>>[];
+    for (var otherSegment in other.segments) {
+      final point = segment.getSegmentIntersection(otherSegment);
+      if (point != null) points.add(point);
+    }
 
-        followingIterator.next();
+    points.sort((a, b) => segment.begin
+        .squaredDistanceTo(a)
+        .compareTo(segment.begin.squaredDistanceTo(b)));
 
-        if (usingThisIterator) {
-          usingThisIterator = false;
-          currentIterator = otherIterator;
-          followingIterator = thisIterator;
-        } else {
-          usingThisIterator = true;
-          currentIterator = thisIterator;
-          followingIterator = otherIterator;
+    return points;
+  }
+
+  void _linkVertices(List<_Vertex> thisShapeVertices) {
+    for (var i = 0; i < thisShapeVertices.length; ++i) {
+      final vertex = thisShapeVertices[i];
+      final prevIndex = i - 1 >= 0 ? i - 1 : thisShapeVertices.length - 1;
+      final nextIndex = i + 1 < thisShapeVertices.length ? i + 1 : 0;
+      vertex.linkedVertices.add(thisShapeVertices[prevIndex]);
+      vertex.linkedVertices.add(thisShapeVertices[nextIndex]);
+    }
+  }
+
+  void _linkCommonVertices(
+    List<_Vertex> verticesA,
+    List<_Vertex> verticesB,
+  ) {
+    for (var va in verticesA) {
+      for (var vb in verticesB) {
+        if (va.point == vb.point) {
+          va.linkedVertices.addAll(vb.linkedVertices);
+          vb.linkedVertices.addAll(va.linkedVertices);
         }
       }
     }
-
-    newSegments.add(currentIterator.currentSegment);
-
-    return BoundingShape(newSegments);
   }
 
-  Pair<int, Point<double>> _findIntersectingSegment(
-      Segment segment, List<Segment> segments) {
-    for (var i = 0; i < segments.length; ++i) {
-      var s = segments[i];
-      final intersection = segment.getSegmentIntersection(s);
-      if (intersection != null) {
-        return Pair(i, intersection);
+  _Vertex _findInitialBottomVertex(List<_Vertex> thisShapeVertices) {
+    _Vertex vertex;
+    for (var v in thisShapeVertices) {
+      if (vertex == null || v.point.y > vertex.point.y) {
+        vertex = v;
+      } else if (v.point.y == vertex.point.y && v.point.x < vertex.point.x) {
+        vertex = v;
       }
     }
-    return null;
+    return vertex;
+  }
+
+  _Vertex _findLeftmostLinkedVertex(
+    _Vertex currentVertex,
+    _Vertex previousVertex,
+  ) {
+    _Vertex vertex;
+    double maxAngle;
+    for (var v in currentVertex.linkedVertices) {
+      final angle =
+          ccwVectorsAngle(currentVertex.point, previousVertex.point, v.point);
+      if (maxAngle == null || angle > maxAngle) {
+        vertex = v;
+        maxAngle = angle;
+      }
+    }
+    return vertex;
   }
 
   static Rectangle _createRectangle(List<Segment> segments) {
@@ -432,22 +480,18 @@ class Segment {
   }
 }
 
-class _SegmentsIterator {
-  final List<Segment> segments;
-  var _currentIndex = 0;
+class _Vertex {
+  final Point<double> point;
 
-  _SegmentsIterator(this.segments);
+  final List<_Vertex> linkedVertices = [];
 
-  Segment get currentSegment => segments[_currentIndex];
+  bool _visited = false;
 
-  void next() {
-    _currentIndex++;
-    if (_currentIndex == segments.length) {
-      _currentIndex = 0;
-    }
-  }
+  _Vertex(this.point);
 
-  void setCurrentIndex(int index) {
-    _currentIndex = index.clamp(0, segments.length - 1);
+  bool get isVisited => _visited;
+
+  void markAsVisited() {
+    _visited = true;
   }
 }

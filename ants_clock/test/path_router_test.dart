@@ -29,17 +29,17 @@ void main() {
       expect(intersection.y, 0.0);
     });
 
-    test('Segment intersection with bounding box', () {
+    test('Segment intersection with bounding shape', () {
       final segment = Segment(Point(0.0, 1.0), Point(8.0, 1.0));
 
-      final boundingBox = BoundingBox(
-        Segment(Point(4.0, 2.0), Point(6.0, 2.0)),
-        Segment(Point(6.0, 2.0), Point(6.0, 0.0)),
-        Segment(Point(6.0, 0.0), Point(4.0, 0.0)),
-        Segment(Point(4.0, 0.0), Point(4.0, 2.0)),
-      );
+      final boundingBox = BoundingShape.fromPoints([
+        Point(6.0, 0.0),
+        Point(6.0, 2.0),
+        Point(4.0, 2.0),
+        Point(4.0, 0.0),
+      ]);
 
-      final intersection = segment.getBoundingBoxIntersection(boundingBox);
+      final intersection = segment.getBoundingShapeIntersection(boundingBox);
 
       expect(intersection, isNotNull);
       expect(intersection.intersection.x, 4.0);
@@ -48,7 +48,7 @@ void main() {
   });
 
   group('BoundingShape', () {
-    test('Bounding shape bounds creation', () {
+    test('Bounding shape bounds rectangle creation', () {
       final bs = BoundingShape([
         Segment(Point(1.0, 1.0), Point(2.0, 2.0)),
         Segment(Point(2.0, 2.0), Point(1.0, 3.0)),
@@ -56,14 +56,14 @@ void main() {
         Segment(Point(0.0, 2.0), Point(1.0, 1.0)),
       ]);
 
-      expect(bs.bounds.top, 1.0);
-      expect(bs.bounds.bottom, 3.0);
-      expect(bs.bounds.left, 0.0);
-      expect(bs.bounds.right, 2.0);
+      expect(bs.boundsRectangle.top, 1.0);
+      expect(bs.boundsRectangle.bottom, 3.0);
+      expect(bs.boundsRectangle.left, 0.0);
+      expect(bs.boundsRectangle.right, 2.0);
     });
 
     test('Get Ant bounding shape with bearing 0', () {
-      final offset = Ant.halfSize + BoundingShape.padding;
+      final offset = Ant.halfSize + BoundingShape.antPadding;
       final ant = Ant(Position(100.0, 100.0, 0.0));
       final boundingShape = BoundingShape.fromAnt(ant);
 
@@ -89,7 +89,7 @@ void main() {
     });
 
     test('Get Ant bounding shape with bearing 90', () {
-      final offset = Ant.halfSize + BoundingShape.padding;
+      final offset = Ant.halfSize + BoundingShape.antPadding;
       final ant = Ant(Position(100.0, 100.0, 90.0));
       final boundingShape = BoundingShape.fromAnt(ant);
 
@@ -181,6 +181,35 @@ void main() {
 
       expect(result.segments.length, 6);
       expect(result.segments.first.begin, result.segments.last.end);
+    });
+
+    test(
+        'Union of two Ants '
+        '(2nd ant is below of 1st ant)', () {
+      final bs1 = BoundingShape.fromAnt(Ant(Position(200.0, 50.0 - 12.0, 0.0)));
+      final bs2 = BoundingShape.fromAnt(Ant(Position(200.0, 50.0 + 12.0, 0.0)));
+
+      // FIXME This test fails!!!
+      final result = bs1.union(bs2);
+
+      expect(result.segments.length, 6);
+      expect(result.segments.first.begin, result.segments.last.end);
+    });
+  });
+
+  group('Path router', () {
+    test('test 1', () {
+      final size = Ant.size + BoundingShape.antPadding;
+
+      final ants = [
+        Ant(Position(50.0, 50.0, 0.0)),
+        Ant(Position(50.0 + size, 50.0, 0.0)),
+        Ant(Position(50.0 + size * 3, 50.0, 0.0)),
+      ];
+
+      final pathRouter = PathRouter(ants);
+
+      expect(pathRouter, isNotNull);
     });
   });
 }

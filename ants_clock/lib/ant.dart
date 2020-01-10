@@ -1,4 +1,3 @@
-import 'package:ants_clock/path_router.dart';
 import 'package:ants_clock/position.dart';
 import 'package:ants_clock/position_shifter.dart';
 
@@ -14,8 +13,6 @@ class Ant {
   int get frame => _frame;
 
   bool get isAtDestination => _positionShifter?.isFinished ?? true;
-
-  BoundingBox get boundingBox => BoundingBox.fromAnt(this);
 
   static const _framesPerSecond = 30.0;
 

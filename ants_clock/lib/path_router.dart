@@ -6,218 +6,105 @@ import 'ant.dart';
 import 'math_utils.dart';
 
 class PathRouter {
-  List<Position> route(Ant traveller, List<Ant> ants, Position destination) {
+  final List<BoundingShape> _boundingShapes = [];
+
+  PathRouter(List<Ant> ants) {
+    /*final boundingShapes =
+        ants.map((ant) => BoundingShape.fromAnt(ant)).toList();
+
+    while (boundingShapes.isNotEmpty) {
+      var bs = boundingShapes.first;
+      final bsToRemove = <int>[];
+
+      if (boundingShapes.length >= 2) {
+        for (var i = 1; i < boundingShapes.length; ++i) {
+          var bs2 = boundingShapes[i];
+
+          if (bs2.intersects(bs)) {
+            bs = bs.union(bs2);
+            bs.containingAnts.addAll(bs2.containingAnts);
+            bsToRemove.add(i);
+          }
+        }
+      }
+
+      _boundingShapes.add(bs);
+
+      for (var index in bsToRemove.reversed) {
+        boundingShapes.removeAt(index);
+      }
+      boundingShapes.removeAt(0);
+    }*/
+  }
+
+  List<Position> route(Ant ant, Position destination) {
     final route = <Position>[];
 
-    final ignoredAnts = [traveller];
-    var currentPosition = traveller.position;
-    BoundingBoxIntersection intersection;
+    /*final bsIntersection = _getFirstBoundingShapeIntersection(
+        ant, ant.position.toPoint(), destination.toPoint());
 
-    do {
-      intersection = _getFirstBoundingBoxIntersection(
-          ignoredAnts, ants, currentPosition.toPoint(), destination.toPoint());
-
-      if (intersection != null) {
-        _walkAroundBoundingBox(
-          route,
-          currentPosition,
-          destination,
-          intersection,
-        );
-        currentPosition = route.last;
-      }
-    } while (intersection != null);
+    if (bsIntersection != null) {
+      route.add(ant.position.positionToPoint(bsIntersection.intersection));
+    }*/
 
     route.add(destination);
-
-    _simplifyRoute(route);
 
     return route;
   }
 
-  BoundingBoxIntersection _getFirstBoundingBoxIntersection(
-    List<Ant> ignoredAnts,
-    List<Ant> ants,
+  BoundingShapeIntersection _getFirstBoundingShapeIntersection(
+    Ant ant,
     Point<double> begin,
     Point<double> end,
   ) {
     final segment = Segment(begin, end);
 
-    BoundingBoxIntersection closestIntersection;
-    Ant closestAnt;
+    BoundingShapeIntersection closestBSIntersection;
 
-    for (var ant in ants) {
-      if (ignoredAnts.contains(ant)) continue;
-
-      final intersection = segment.getBoundingBoxIntersection(ant.boundingBox);
-      if (intersection != null) {
-        if (closestIntersection == null ||
-            closestIntersection.squaredDistance >
-                intersection.squaredDistance) {
-          closestIntersection = intersection;
-          closestAnt = ant;
+    for (var bs in _boundingShapes) {
+      final bsIntersection = segment.getBoundingShapeIntersection(bs);
+      if (bsIntersection != null) {
+        if (closestBSIntersection == null ||
+            bsIntersection.squaredDistance <
+                closestBSIntersection.squaredDistance) {
+          closestBSIntersection = bsIntersection;
         }
       }
     }
 
-    if (closestAnt != null) {
-      ignoredAnts.add(closestAnt);
-    }
-
-    return closestIntersection;
+    return closestBSIntersection;
   }
 
-  List<Point<double>> _getAdjacentSegmentsVertices(
-    List<Ant> ants,
-    BoundingBox boundingBox,
-    BoundingBoxSegment boundingBoxSegment,
-  ) {
-    final segment = boundingBox.getSegment(boundingBoxSegment);
-    segment.getBoundingBoxIntersection(boundingBox);
-  }
-
-  void _walkAroundBoundingBox(
+  void _walkAroundBoundingShape(
     List<Position> route,
     Position begin,
     Position end,
-    BoundingBoxIntersection boundingBoxIntersection,
+    BoundingShapeIntersection boundingShapeIntersection,
   ) {
-    final boundingBox = boundingBoxIntersection.boundingBox;
-    final boundingBoxSegment = boundingBoxIntersection.boundingBoxSegment;
-    final vertices = boundingBox.getAllVertices(boundingBoxSegment, true);
-
-    var currentPosition =
-        begin.positionToPoint(boundingBoxIntersection.intersection);
-    route.add(currentPosition);
-
-    var currentVertex = vertices.first;
-
-    final endPoint = end.toPoint();
-    double currentDistance = currentVertex.squaredDistanceTo(endPoint);
-    double previousDistance;
-
-    while (previousDistance == null || previousDistance > currentDistance) {
-      currentPosition = currentPosition.positionToPoint(currentVertex);
-      route.add(currentPosition);
-
-      previousDistance = currentDistance;
-      vertices.removeAt(0);
-      currentVertex = vertices.first;
-      currentDistance = currentVertex.squaredDistanceTo(endPoint);
-    }
+    throw UnimplementedError();
   }
 
   void _simplifyRoute(List<Position> route) {
-    // route.removeAt(0);
-    // for (var i = route.length - 1; i >= 0; --i) {}
+    throw UnimplementedError();
   }
 }
-
-class BoundingBox {
-  final Segment top;
-  final Segment right;
-  final Segment bottom;
-  final Segment left;
-
-  BoundingBox(this.top, this.right, this.bottom, this.left);
-
-  factory BoundingBox.fromAnt(Ant ant) {
-    final offset = Ant.halfSize + 5.0;
-    final topLeft = _getRotatedAntPoint(ant, -offset, -offset);
-    final topRight = _getRotatedAntPoint(ant, offset, -offset);
-    final bottomLeft = _getRotatedAntPoint(ant, -offset, offset);
-    final bottomRight = _getRotatedAntPoint(ant, offset, offset);
-
-    return BoundingBox(
-      Segment(topLeft, topRight),
-      Segment(topRight, bottomRight),
-      Segment(bottomRight, bottomLeft),
-      Segment(bottomLeft, topLeft),
-    );
-  }
-
-  Segment getSegment(BoundingBoxSegment which) {
-    switch (which) {
-      case BoundingBoxSegment.top:
-        return top;
-      case BoundingBoxSegment.right:
-        return right;
-      case BoundingBoxSegment.bottom:
-        return bottom;
-      case BoundingBoxSegment.left:
-        return left;
-    }
-    throw ArgumentError.value(which);
-  }
-
-  BoundingBoxSegment getNextBoundingBoxSegment(
-      BoundingBoxSegment which, bool clockwise) {
-    if (clockwise) {
-      switch (which) {
-        case BoundingBoxSegment.top:
-          return BoundingBoxSegment.right;
-        case BoundingBoxSegment.right:
-          return BoundingBoxSegment.bottom;
-        case BoundingBoxSegment.bottom:
-          return BoundingBoxSegment.left;
-        case BoundingBoxSegment.left:
-          return BoundingBoxSegment.top;
-      }
-    } else {
-      switch (which) {
-        case BoundingBoxSegment.top:
-          return BoundingBoxSegment.left;
-        case BoundingBoxSegment.right:
-          return BoundingBoxSegment.top;
-        case BoundingBoxSegment.bottom:
-          return BoundingBoxSegment.right;
-        case BoundingBoxSegment.left:
-          return BoundingBoxSegment.bottom;
-      }
-    }
-    throw ArgumentError.value(which);
-  }
-
-  List<Point<double>> getAllVertices(
-    BoundingBoxSegment segmentFrom,
-    bool clockwise,
-  ) {
-    final points = <Point<double>>[];
-    var currentSegment = segmentFrom;
-    for (var i = 0; i < 4; ++i) {
-      final segment = getSegment(currentSegment);
-      points.add(clockwise ? segment.end : segment.begin);
-      currentSegment = getNextBoundingBoxSegment(currentSegment, clockwise);
-    }
-    return points;
-  }
-
-  static Point<double> _getRotatedAntPoint(
-      Ant ant, double xOffset, double yOffset) {
-    return rotatePoint(
-      Point(
-        ant.position.x + xOffset,
-        ant.position.y + yOffset,
-      ),
-      ant.position.toPoint(),
-      ant.position.bearing,
-    );
-  }
-}
-
-enum BoundingBoxSegment { top, right, bottom, left }
 
 class BoundingShape {
-  static const padding = 5.0;
+  static const double antPadding = 5.0;
 
   final List<Segment> segments;
 
-  final Rectangle bounds;
+  final Rectangle boundsRectangle;
 
-  BoundingShape(this.segments) : bounds = _createRectangle(segments);
+  // TODO Create a boundsSegments to optimize segment intersections calculation
+  // final List<Segment> boundsSegments;
+
+  final List<Ant> containingAnts = [];
+
+  BoundingShape(this.segments) : boundsRectangle = _createRectangle(segments);
 
   factory BoundingShape.fromAnt(Ant ant) {
-    final offset = Ant.halfSize + padding;
+    final offset = Ant.halfSize + antPadding;
     final topLeft = _getRotatedAntPoint(ant, -offset, -offset);
     final topRight = _getRotatedAntPoint(ant, offset, -offset);
     final bottomLeft = _getRotatedAntPoint(ant, -offset, offset);
@@ -228,7 +115,8 @@ class BoundingShape {
       Segment(topRight, bottomRight),
       Segment(bottomRight, bottomLeft),
       Segment(bottomLeft, topLeft),
-    ]);
+    ])
+      ..containingAnts.add(ant);
   }
 
   factory BoundingShape.fromPoints(List<Point<double>> points) {
@@ -243,7 +131,7 @@ class BoundingShape {
   }
 
   bool intersects(BoundingShape other) {
-    if (!bounds.intersects(other.bounds)) return false;
+    if (!boundsRectangle.intersects(other.boundsRectangle)) return false;
 
     for (var segment in segments) {
       for (var otherSegment in other.segments) {
@@ -384,15 +272,15 @@ class BoundingShape {
   }
 }
 
-class BoundingBoxIntersection {
-  final BoundingBox boundingBox;
-  final BoundingBoxSegment boundingBoxSegment;
+class BoundingShapeIntersection {
+  final BoundingShape boundingShape;
+  final int segmentIndex;
   final Point<double> intersection;
   final double squaredDistance;
 
-  BoundingBoxIntersection(
-    this.boundingBox,
-    this.boundingBoxSegment,
+  BoundingShapeIntersection(
+    this.boundingShape,
+    this.segmentIndex,
     this.intersection,
     this.squaredDistance,
   );
@@ -419,36 +307,27 @@ class Segment {
         : null;
   }
 
-  BoundingBoxIntersection getBoundingBoxIntersection(BoundingBox boundingBox) {
-    final intersections = <BoundingBoxIntersection>[
-      _createBoundingBoxIntersection(boundingBox, BoundingBoxSegment.top),
-      _createBoundingBoxIntersection(boundingBox, BoundingBoxSegment.right),
-      _createBoundingBoxIntersection(boundingBox, BoundingBoxSegment.bottom),
-      _createBoundingBoxIntersection(boundingBox, BoundingBoxSegment.left),
-    ];
-
-    intersections.removeWhere((i) => i == null);
-    intersections.sort((a, b) {
-      return a.squaredDistance.compareTo(b.squaredDistance);
-    });
-
-    return intersections.isNotEmpty ? intersections.first : null;
-  }
-
-  BoundingBoxIntersection _createBoundingBoxIntersection(
-    BoundingBox boundingBox,
-    BoundingBoxSegment boundingBoxSegment,
+  BoundingShapeIntersection getBoundingShapeIntersection(
+    BoundingShape boundingShape,
   ) {
-    final segment = boundingBox.getSegment(boundingBoxSegment);
-    final intersection = getSegmentIntersection(segment);
-    return intersection != null
-        ? BoundingBoxIntersection(
-            boundingBox,
-            boundingBoxSegment,
-            intersection,
-            begin.squaredDistanceTo(intersection),
-          )
-        : null;
+    BoundingShapeIntersection closestIntersection;
+
+    for (var i = 0; i < boundingShape.segments.length; ++i) {
+      final segment = boundingShape.segments[i];
+      final point = getSegmentIntersection(segment);
+
+      if (point != null) {
+        final distance = begin.squaredDistanceTo(point);
+
+        if (closestIntersection == null ||
+            closestIntersection.squaredDistance > distance) {
+          closestIntersection =
+              BoundingShapeIntersection(boundingShape, i, point, distance);
+        }
+      }
+    }
+
+    return closestIntersection;
   }
 
   Point<double> _calcIntersectionPoint(Segment other) {

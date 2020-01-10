@@ -11,27 +11,23 @@ class ColonyController {
     _minute = minute;
     _shouldRenderTime = true;
 
-    // DBG BEGIN
-
-    ants.add(Ant(Position(30.0, worldHeight / 2.0, 0.0)));
-
-    /*for (var i = 0; i < 10; ++i) {
+    // DBG BEGIN CODE TO TEST PATH ROUTER
+    /*ants.add(Ant(Position(30.0, worldHeight / 2.0, 0.0)));
+    for (var i = 0; i < 10; ++i) {
       ants.add(Ant(Position(
         250.0 + ((random.nextDouble() * 200.0) - 100.0),
         worldHeight / 2.0 + ((random.nextDouble() * 200.0) - 100.0),
         0.0,
       )));
-    }*/
-
+    }
     ants.add(Ant(Position(200.0 + 0, worldHeight / 2.0 - 12, 0.0)));
     ants.add(Ant(Position(200.0 + 0, worldHeight / 2.0 + 12, 0.0)));
-    ants.add(Ant(Position(200.0 + 100, worldHeight / 2.0 + 0, 0.0)));
-
+    ants.add(Ant(Position(200.0 + 100, worldHeight / 2.0 + 0, 0.0)));*/
     // DBG END
 
-    /*for (var i = 0; i < _antsNumber; ++i) {
+    for (var i = 0; i < _antsNumber; ++i) {
       ants.add(Ant(Position.random(worldWidth, worldHeight)));
-    }*/
+    }
   }
 
   final double worldWidth;
@@ -58,7 +54,7 @@ class ColonyController {
 
   final _antBoundaryPositions = <int, Position>{};
 
-  final _pathRouter = PathRouter();
+  PathRouter _pathRouter;
 
   void setTime(int hour, int minute) {
     _hour = hour;
@@ -69,12 +65,13 @@ class ColonyController {
   void tick(Duration elapsed) {
     _elapsed ??= elapsed;
 
-    // DBG
-    if (ants.first.isAtDestination &&
+    _pathRouter ??= PathRouter(ants);
+
+    // DBG CODE TO TEST PATH ROUTER
+    /*if (ants.first.isAtDestination &&
         ants.first.position.x < worldWidth - 30.0) {
       final route = _pathRouter.route(
           ants.first,
-          ants,
           Position(
             worldWidth - 30.0,
             worldHeight / 2.0,
@@ -82,9 +79,9 @@ class ColonyController {
           ));
 
       ants.first.setRoute(route);
-    }
+    }*/
 
-    /*if (_shouldRenderTime) {
+    if (_shouldRenderTime) {
       _assignAntDigitPositions(_hour, _minute);
       _assignAntBoundaryPositions();
       _shouldRenderTime = false;
@@ -92,7 +89,7 @@ class ColonyController {
       final antIndexList = _antBoundaryPositions.keys.toList();
       final antIndex = antIndexList[random.nextInt(antIndexList.length)];
       _assignAntBoundaryPosition(antIndex, skipAnts: true);
-    }*/
+    }
 
     for (var ant in ants) {
       ant.move(elapsed);
@@ -142,7 +139,7 @@ class ColonyController {
     List<Position> route;
 
     if (skipAnts) {
-      route = _pathRouter.route(ants[antIndex], ants, position);
+      route = _pathRouter.route(ants[antIndex], position);
     } else {
       route = [position];
     }

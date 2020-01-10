@@ -21,6 +21,9 @@ class Position {
           random.nextDouble() * 360.0,
         );
 
+  Position.fromPoint(Point<double> point, double bearing)
+      : this(point.x, point.y, bearing);
+
   double distanceTo(Position position) {
     var dx = x - position.x;
     var dy = y - position.y;
@@ -28,20 +31,24 @@ class Position {
   }
 
   double bearingTo(Position position) {
-    final c = distanceTo(position);
-    final a = (position.x - x).abs();
+    return bearingToPoint(position.toPoint());
+  }
+
+  double bearingToPoint(Point<double> point) {
+    final c = toPoint().distanceTo(point);
+    final a = (point.x - x).abs();
     if (c == 0.0) {
       return bearing;
     } else {
       final angle = radToDeg(acos(a / c));
-      if (position.x >= x) {
-        if (position.y <= y) {
+      if (point.x >= x) {
+        if (point.y <= y) {
           return 90.0 - angle;
         } else {
           return 90.0 + angle;
         }
       } else {
-        if (position.y <= y) {
+        if (point.y <= y) {
           return 270.0 + angle;
         } else {
           return 270.0 - angle;
@@ -51,8 +58,7 @@ class Position {
   }
 
   Position positionToPoint(Point<double> point) {
-    final tmpPosition = Position(point.x, point.y, 0.0);
-    return Position(point.x, point.y, bearingTo(tmpPosition));
+    return Position.fromPoint(point, bearingToPoint(point));
   }
 
   Position offset(double distance, [double bearing]) {

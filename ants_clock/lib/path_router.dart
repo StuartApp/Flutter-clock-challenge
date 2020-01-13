@@ -9,7 +9,7 @@ class PathRouter {
   final List<BoundingShape> _boundingShapes = [];
 
   PathRouter(List<Ant> ants) {
-    /*final boundingShapes =
+    final boundingShapes =
         ants.map((ant) => BoundingShape.fromAnt(ant)).toList();
 
     while (boundingShapes.isNotEmpty) {
@@ -22,7 +22,7 @@ class PathRouter {
 
           if (bs2.intersects(bs)) {
             bs = bs.union(bs2);
-            bs.containingAnts.addAll(bs2.containingAnts);
+            bs.relatedAnts.addAll(bs2.relatedAnts);
             bsToRemove.add(i);
           }
         }
@@ -34,18 +34,26 @@ class PathRouter {
         boundingShapes.removeAt(index);
       }
       boundingShapes.removeAt(0);
-    }*/
+    }
   }
 
   List<Position> route(Ant ant, Position destination) {
     final route = <Position>[];
 
-    /*final bsIntersection = _getFirstBoundingShapeIntersection(
-        ant, ant.position.toPoint(), destination.toPoint());
+    Position currentPosition = ant.position;
 
-    if (bsIntersection != null) {
-      route.add(ant.position.positionToPoint(bsIntersection.intersection));
-    }*/
+    var bsIntersection = _getFirstBoundingShapeIntersection(
+        ant, currentPosition.toPoint(), destination.toPoint());
+
+    while (bsIntersection != null) {
+      _walkAroundBoundingShape(
+          route, currentPosition, destination, bsIntersection);
+
+      currentPosition = route.last;
+
+      bsIntersection = _getFirstBoundingShapeIntersection(
+          ant, currentPosition.toPoint(), destination.toPoint());
+    }
 
     route.add(destination);
 
@@ -62,12 +70,16 @@ class PathRouter {
     BoundingShapeIntersection closestBSIntersection;
 
     for (var bs in _boundingShapes) {
+      if (bs.relatedAnts.contains(ant)) continue;
+
       final bsIntersection = segment.getBoundingShapeIntersection(bs);
       if (bsIntersection != null) {
         if (closestBSIntersection == null ||
             bsIntersection.squaredDistance <
                 closestBSIntersection.squaredDistance) {
-          closestBSIntersection = bsIntersection;
+          if (bsIntersection.point != begin) {
+            closestBSIntersection = bsIntersection;
+          }
         }
       }
     }
@@ -79,9 +91,32 @@ class PathRouter {
     List<Position> route,
     Position begin,
     Position end,
-    BoundingShapeIntersection boundingShapeIntersection,
+    BoundingShapeIntersection bsIntersection,
   ) {
-    throw UnimplementedError();
+    route.add(begin.positionToPoint(bsIntersection.point));
+
+    final segments = bsIntersection.boundingShape.segments;
+    final Point<double> endPoint = end.toPoint();
+
+    Point<double> closestPoint;
+    double closestDistance;
+    for (var segment in segments) {
+      final distance = segment.end.squaredDistanceTo(endPoint);
+      if (closestDistance == null ||
+          segment.end.squaredDistanceTo(endPoint) < closestDistance) {
+        closestPoint = segment.end;
+        closestDistance = distance;
+      }
+    }
+
+    var index = bsIntersection.segmentIndex;
+    while (segments[index].end != closestPoint) {
+      route.add(route.last.positionToPoint(segments[index].end));
+      index++;
+      if (index >= segments.length) index = 0;
+    }
+
+    route.add(route.last.positionToPoint(segments[index].end));
   }
 
   void _simplifyRoute(List<Position> route) {
@@ -99,7 +134,7 @@ class BoundingShape {
   // TODO Create a boundsSegments to optimize segment intersections calculation
   // final List<Segment> boundsSegments;
 
-  final List<Ant> containingAnts = [];
+  final Set<Ant> relatedAnts = Set();
 
   BoundingShape(this.segments) : boundsRectangle = _createRectangle(segments);
 
@@ -110,13 +145,14 @@ class BoundingShape {
     final bottomLeft = _getRotatedAntPoint(ant, -offset, offset);
     final bottomRight = _getRotatedAntPoint(ant, offset, offset);
 
-    return BoundingShape([
-      Segment(topLeft, topRight),
-      Segment(topRight, bottomRight),
-      Segment(bottomRight, bottomLeft),
-      Segment(bottomLeft, topLeft),
-    ])
-      ..containingAnts.add(ant);
+    return BoundingShape(
+      [
+        Segment(topLeft, topRight),
+        Segment(topRight, bottomRight),
+        Segment(bottomRight, bottomLeft),
+        Segment(bottomLeft, topLeft),
+      ],
+    )..relatedAnts.add(ant);
   }
 
   factory BoundingShape.fromPoints(List<Point<double>> points) {
@@ -150,9 +186,10 @@ class BoundingShape {
     _linkVertices(otherShapeVertices);
     _linkCommonVertices(thisShapeVertices, otherShapeVertices);
 
-    final initialVertex = _findInitialBottomVertex(thisShapeVertices);
+    final initialVertex =
+        _findInitialBottomVertex([thisShapeVertices, otherShapeVertices]);
     _Vertex currentVertex = initialVertex;
-    _Vertex previousVertex = _Vertex(initialVertex.point - Point(1.0, 0.0));
+    _Vertex previousVertex = _Vertex(initialVertex.point - Point(1.0, 0.0), false);
 
     final points = <Point<double>>[];
 
@@ -172,10 +209,18 @@ class BoundingShape {
     final vertices = <_Vertex>[];
     for (var segment in segments) {
       final points = _findIntersections(segment, other);
-      vertices.addAll(points.map((p) => _Vertex(p)));
-      vertices.add(_Vertex(segment.end));
+      vertices.addAll(points.map((p) => _Vertex(p, true)));
+      vertices.add(_Vertex(segment.end, false));
     }
-    return vertices;
+
+    final verticesFiltered = <_Vertex>[];
+    for (var i = 0; i < vertices.length; ++i) {
+      if (i == 0 || vertices[i - 1] != vertices[i]) {
+        verticesFiltered.add(vertices[i]);
+      }
+    }
+
+    return verticesFiltered;
   }
 
   List<Point<double>> _findIntersections(Segment segment, BoundingShape other) {
@@ -216,13 +261,15 @@ class BoundingShape {
     }
   }
 
-  _Vertex _findInitialBottomVertex(List<_Vertex> thisShapeVertices) {
+  _Vertex _findInitialBottomVertex(List<List<_Vertex>> verticesLists) {
     _Vertex vertex;
-    for (var v in thisShapeVertices) {
-      if (vertex == null || v.point.y > vertex.point.y) {
-        vertex = v;
-      } else if (v.point.y == vertex.point.y && v.point.x < vertex.point.x) {
-        vertex = v;
+    for (var vertices in verticesLists) {
+      for (var v in vertices) {
+        if (vertex == null || v.point.y > vertex.point.y) {
+          vertex = v;
+        } else if (v.point.y == vertex.point.y && v.point.x < vertex.point.x) {
+          vertex = v;
+        }
       }
     }
     return vertex;
@@ -275,13 +322,13 @@ class BoundingShape {
 class BoundingShapeIntersection {
   final BoundingShape boundingShape;
   final int segmentIndex;
-  final Point<double> intersection;
+  final Point<double> point;
   final double squaredDistance;
 
   BoundingShapeIntersection(
     this.boundingShape,
     this.segmentIndex,
-    this.intersection,
+    this.point,
     this.squaredDistance,
   );
 }
@@ -331,28 +378,30 @@ class Segment {
   }
 
   Point<double> _calcIntersectionPoint(Segment other) {
-    final a1 = end.x != begin.x ? (end.y - begin.y) / (end.x - begin.x) : 1;
-    final b1 = -((begin.x * a1) - begin.y);
+    final m1 = begin.x != end.x
+        ? (end.y - begin.y) / (end.x - begin.x)
+        : double.infinity;
+    final c1 = -((begin.x * m1) - begin.y);
 
-    final a2 = other.end.x != other.begin.x
+    final m2 = other.begin.x != other.end.x
         ? (other.end.y - other.begin.y) / (other.end.x - other.begin.x)
-        : 1;
-    final b2 = -((other.begin.x * a2) - other.begin.y);
+        : double.infinity;
+    final c2 = -((other.begin.x * m2) - other.begin.y);
 
     double x;
     double y;
 
-    if (a1 == a2) {
+    if (m1 == m2) {
       return null;
-    } else if (a1 == 1) {
+    } else if (m1 == double.infinity) {
       x = begin.x;
-      y = (a2 * x) + b2;
-    } else if (a2 == 1) {
+      y = (m2 * x) + c2;
+    } else if (m2 == double.infinity) {
       x = other.begin.x;
-      y = (a1 * x) + b1;
+      y = (m1 * x) + c1;
     } else {
-      x = (b2 - b1) / (a1 - a2);
-      y = (a1 * x) + b1;
+      x = (c2 - c1) / (m1 - m2);
+      y = (m1 * x) + c1;
     }
 
     return Point(x, y);
@@ -362,15 +411,27 @@ class Segment {
 class _Vertex {
   final Point<double> point;
 
-  final List<_Vertex> linkedVertices = [];
+  final Set<_Vertex> linkedVertices = Set();
+
+  final bool isIntersection;
 
   bool _visited = false;
 
-  _Vertex(this.point);
+  _Vertex(this.point, this.isIntersection);
 
   bool get isVisited => _visited;
 
   void markAsVisited() {
     _visited = true;
   }
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is _Vertex &&
+          runtimeType == other.runtimeType &&
+          point == other.point;
+
+  @override
+  int get hashCode => point.hashCode;
 }

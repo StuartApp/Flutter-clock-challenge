@@ -29,6 +29,17 @@ void main() {
       expect(intersection.y, 0.0);
     });
 
+    test('Segment intersection with other segment', () {
+      final segment1 = Segment(Point(0.0, 0.0), Point(4.0, 4.0));
+      final segment2 = Segment(Point(0.0, 2.0), Point(4.0, 2.0));
+
+      final intersection = segment1.getSegmentIntersection(segment2);
+
+      expect(intersection, isNotNull);
+      expect(intersection.x, 2.0);
+      expect(intersection.y, 2.0);
+    });
+
     test('Segment intersection with bounding shape', () {
       final segment = Segment(Point(0.0, 1.0), Point(8.0, 1.0));
 
@@ -42,8 +53,8 @@ void main() {
       final intersection = segment.getBoundingShapeIntersection(boundingBox);
 
       expect(intersection, isNotNull);
-      expect(intersection.intersection.x, 4.0);
-      expect(intersection.intersection.y, 1.0);
+      expect(intersection.point.x, 4.0);
+      expect(intersection.point.y, 1.0);
     });
   });
 
@@ -184,32 +195,81 @@ void main() {
     });
 
     test(
-        'Union of two Ants '
-        '(2nd ant is below of 1st ant)', () {
-      final bs1 = BoundingShape.fromAnt(Ant(Position(200.0, 50.0 - 12.0, 0.0)));
-      final bs2 = BoundingShape.fromAnt(Ant(Position(200.0, 50.0 + 12.0, 0.0)));
+        'Union of two bounding shapes '
+        '(2nd square is below of 1st square)', () {
+      final bs1 = BoundingShape.fromPoints([
+        Point(0.0, 0.0),
+        Point(10.0, 0.0),
+        Point(10.0, 10.0),
+        Point(0.0, 10.0),
+      ]);
+      final bs2 = BoundingShape.fromPoints([
+        Point(0.0, 5.0),
+        Point(10.0, 5.0),
+        Point(10.0, 15.0),
+        Point(0.0, 15.0),
+      ]);
 
-      // FIXME This test fails!!!
       final result = bs1.union(bs2);
 
-      expect(result.segments.length, 6);
+      expect(result.segments.length, 8);
       expect(result.segments.first.begin, result.segments.last.end);
     });
+
+    test('Union of two squares (One is rotated 45 degrees)', () {
+      final bs1 = BoundingShape.fromPoints([
+        Point(0.0, 0.0),
+        Point(10.0, 0.0),
+        Point(10.0, 10.0),
+        Point(0.0, 10.0),
+      ]);
+      final bs2 = BoundingShape.fromPoints([
+        Point(5.0, 8.0),
+        Point(10.0, 13.0),
+        Point(5.0, 18.0),
+        Point(0.0, 13.0),
+      ]);
+
+      final result = bs1.union(bs2);
+
+      expect(result.segments.length, 7);
+      expect(result.segments.first.begin, result.segments.last.end);
+    });
+
+    /*test('Union of two Ants', () {
+      final bs1 = BoundingShape.fromAnt(Ant(Position(
+        50.0, // 203.71428571428572,
+        50.0, // 133.57142857142858,
+        0.0, // 0.48988011388701125,
+      )));
+      final bs2 = BoundingShape.fromAnt(Ant(Position(
+        50.0, // 203.71428571428572,
+        57.0, // 109.28571428571429,
+        45.0, // 358.6102085078564,
+      )));
+
+      final result = bs1.union(bs2);
+
+      expect(result.segments.length, 8);
+      expect(result.segments.first.begin, result.segments.last.end);
+    });*/
   });
 
   group('Path router', () {
     test('test 1', () {
-      final size = Ant.size + BoundingShape.antPadding;
+      final size = Ant.size + (BoundingShape.antPadding * 2);
 
       final ants = [
+        Ant(Position(0, 50.0, 0.0)),
         Ant(Position(50.0, 50.0, 0.0)),
-        Ant(Position(50.0 + size, 50.0, 0.0)),
-        Ant(Position(50.0 + size * 3, 50.0, 0.0)),
+        Ant(Position(50.0, 50.0 + size - 5.0, 0.0)),
+        Ant(Position(100.0, 50.0, 0.0)),
       ];
 
       final pathRouter = PathRouter(ants);
+      final route = pathRouter.route(ants.first, Position(150.0, 50.0, 0.0));
 
-      expect(pathRouter, isNotNull);
+      expect(route.length, 8);
     });
   });
 }

@@ -65,8 +65,6 @@ class ColonyController {
   void tick(Duration elapsed) {
     _elapsed ??= elapsed;
 
-    _pathRouter ??= PathRouter(ants);
-
     // DBG CODE TO TEST PATH ROUTER
     /*if (ants.first.isAtDestination &&
         ants.first.position.x < worldWidth - 30.0) {
@@ -84,12 +82,17 @@ class ColonyController {
     if (_shouldRenderTime) {
       _assignAntDigitPositions(_hour, _minute);
       _assignAntBoundaryPositions();
+      _pathRouter = null;
       _shouldRenderTime = false;
     } else if (random.nextInt(100) == 0) {
       final antIndexList = _antBoundaryPositions.keys.toList();
       final antIndex = antIndexList[random.nextInt(antIndexList.length)];
       _assignAntBoundaryPosition(antIndex, skipAnts: true);
     }
+
+    /*if (_pathRouter == null && ants.every((a) => a.isAtDestination)) {
+      _pathRouter = PathRouter(ants);
+    }*/
 
     for (var ant in ants) {
       ant.move(elapsed);
@@ -138,7 +141,7 @@ class ColonyController {
 
     List<Position> route;
 
-    if (skipAnts) {
+    if (_pathRouter != null && skipAnts) {
       route = _pathRouter.route(ants[antIndex], position);
     } else {
       route = [position];

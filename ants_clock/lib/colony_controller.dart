@@ -17,12 +17,13 @@ class ColonyController {
       ants.add(Ant(Position(
         250.0 + ((random.nextDouble() * 200.0) - 100.0),
         worldHeight / 2.0 + ((random.nextDouble() * 200.0) - 100.0),
-        0.0,
+        random.nextDouble() * 360.0,
       )));
     }
-    ants.add(Ant(Position(200.0 + 0, worldHeight / 2.0 - 12, 0.0)));
-    ants.add(Ant(Position(200.0 + 0, worldHeight / 2.0 + 12, 0.0)));
-    ants.add(Ant(Position(200.0 + 100, worldHeight / 2.0 + 0, 0.0)));*/
+    ants.add(Ant(Position(200.0 + 0, worldHeight / 2.0 - 24, 0.0)));
+    ants.add(Ant(Position(200.0 + 0, worldHeight / 2.0 - 12, 15.0)));
+    ants.add(Ant(Position(200.0 + 0, worldHeight / 2.0 + 12, 170.0)));
+    ants.add(Ant(Position(200.0 + 100, worldHeight / 2.0 + 0, 85.0)));*/
     // DBG END
 
     for (var i = 0; i < _antsNumber; ++i) {
@@ -68,6 +69,7 @@ class ColonyController {
     // DBG CODE TO TEST PATH ROUTER
     /*if (ants.first.isAtDestination &&
         ants.first.position.x < worldWidth - 30.0) {
+      _pathRouter ??= PathRouter(ants);
       final route = _pathRouter.route(
           ants.first,
           Position(

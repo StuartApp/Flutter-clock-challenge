@@ -232,27 +232,45 @@ void main() {
 
       final result = bs1.union(bs2);
 
-      expect(result.segments.length, 7);
+      expect(result.segments.length, 9);
       expect(result.segments.first.begin, result.segments.last.end);
     });
 
-    /*test('Union of two Ants', () {
+    test('Union of two Ants #1', () {
       final bs1 = BoundingShape.fromAnt(Ant(Position(
-        50.0, // 203.71428571428572,
-        50.0, // 133.57142857142858,
-        0.0, // 0.48988011388701125,
+        203.71428571428572,
+        133.57142857142858,
+        0.48988011388701125,
       )));
       final bs2 = BoundingShape.fromAnt(Ant(Position(
-        50.0, // 203.71428571428572,
-        57.0, // 109.28571428571429,
-        45.0, // 358.6102085078564,
+        203.71428571428572,
+        109.28571428571429,
+        358.6102085078564,
       )));
 
       final result = bs1.union(bs2);
 
-      expect(result.segments.length, 8);
+      expect(result.segments.length, 6);
       expect(result.segments.first.begin, result.segments.last.end);
-    });*/
+    });
+
+    test('Union of two Ants #2', () {
+      final bs1 = BoundingShape.fromAnt(Ant(Position(
+        260.38095238095235,
+        80.95238095238096,
+        279.95092304648205,
+      )));
+      final bs2 = BoundingShape.fromAnt(Ant(Position(
+        244.19047619047618,
+        80.95238095238096,
+        83.60391833349462,
+      )));
+
+      final result = bs1.union(bs2);
+
+      expect(result.segments.length, 10);
+      expect(result.segments.first.begin, result.segments.last.end);
+    });
   });
 
   group('Path router', () {

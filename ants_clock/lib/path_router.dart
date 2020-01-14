@@ -1,3 +1,4 @@
+import 'dart:collection';
 import 'dart:math';
 
 import 'package:ants_clock/position.dart';
@@ -77,7 +78,7 @@ class PathRouter {
         if (closestBSIntersection == null ||
             bsIntersection.squaredDistance <
                 closestBSIntersection.squaredDistance) {
-          if (bsIntersection.point != begin) {
+          if (!_pointIsCloseTo(bsIntersection.point, begin)) {
             closestBSIntersection = bsIntersection;
           }
         }
@@ -186,14 +187,13 @@ class BoundingShape {
     _linkVertices(otherShapeVertices);
     _linkCommonVertices(thisShapeVertices, otherShapeVertices);
 
-    final initialVertex =
-        _findInitialBottomVertex([thisShapeVertices, otherShapeVertices]);
-    _Vertex currentVertex = initialVertex;
-    _Vertex previousVertex = _Vertex(initialVertex.point - Point(1.0, 0.0), false);
-
     final points = <Point<double>>[];
 
-    while (currentVertex != initialVertex || !currentVertex.isVisited) {
+    _Vertex currentVertex =
+        _findInitialBottomVertex([thisShapeVertices, otherShapeVertices]);
+    _Vertex previousVertex = _Vertex(currentVertex.point - Point(1.0, 0.0));
+
+    while (!currentVertex.isVisited) {
       points.add(currentVertex.point);
       _Vertex nextVertex =
           _findLeftmostLinkedVertex(currentVertex, previousVertex);
@@ -206,33 +206,31 @@ class BoundingShape {
   }
 
   List<_Vertex> _getShapeVertices(BoundingShape other) {
-    final vertices = <_Vertex>[];
+    final points = LinkedHashSet<Point<double>>();
     for (var segment in segments) {
-      final points = _findIntersections(segment, other);
-      vertices.addAll(points.map((p) => _Vertex(p, true)));
-      vertices.add(_Vertex(segment.end, false));
+      final intersections = _findIntersections(segment, other, true);
+      points.addAll(intersections);
+      points.add(segment.end);
     }
-
-    final verticesFiltered = <_Vertex>[];
-    for (var i = 0; i < vertices.length; ++i) {
-      if (i == 0 || vertices[i - 1] != vertices[i]) {
-        verticesFiltered.add(vertices[i]);
-      }
-    }
-
-    return verticesFiltered;
+    return points.map((p) => _Vertex(p)).toList();
   }
 
-  List<Point<double>> _findIntersections(Segment segment, BoundingShape other) {
+  List<Point<double>> _findIntersections(
+    Segment segment,
+    BoundingShape other,
+    bool sorted,
+  ) {
     final points = <Point<double>>[];
     for (var otherSegment in other.segments) {
       final point = segment.getSegmentIntersection(otherSegment);
       if (point != null) points.add(point);
     }
 
-    points.sort((a, b) => segment.begin
-        .squaredDistanceTo(a)
-        .compareTo(segment.begin.squaredDistanceTo(b)));
+    if (sorted) {
+      points.sort((a, b) => segment.begin
+          .squaredDistanceTo(a)
+          .compareTo(segment.begin.squaredDistanceTo(b)));
+    }
 
     return points;
   }
@@ -282,6 +280,7 @@ class BoundingShape {
     _Vertex vertex;
     double maxAngle;
     for (var v in currentVertex.linkedVertices) {
+      if (v == previousVertex) continue;
       final angle =
           ccwVectorsAngle(currentVertex.point, previousVertex.point, v.point);
       if (maxAngle == null || angle > maxAngle) {
@@ -413,11 +412,9 @@ class _Vertex {
 
   final Set<_Vertex> linkedVertices = Set();
 
-  final bool isIntersection;
-
   bool _visited = false;
 
-  _Vertex(this.point, this.isIntersection);
+  _Vertex(this.point);
 
   bool get isVisited => _visited;
 
@@ -434,4 +431,8 @@ class _Vertex {
 
   @override
   int get hashCode => point.hashCode;
+}
+
+bool _pointIsCloseTo(Point<double> a, Point<double> b) {
+  return (a.x - b.x).abs() < 0.001 && (a.y - b.y).abs() < 0.001;
 }

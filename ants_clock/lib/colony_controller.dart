@@ -12,23 +12,21 @@ class ColonyController {
     _shouldRenderTime = true;
 
     // DBG BEGIN CODE TO TEST PATH ROUTER
-    /*ants.add(Ant(Position(30.0, worldHeight / 2.0, 0.0)));
-    for (var i = 0; i < 10; ++i) {
+    ants.add(Ant(Position(30.0, worldHeight / 2.0, 0.0)));
+    /*for (var i = 0; i < 30; ++i) {
       ants.add(Ant(Position(
         250.0 + ((random.nextDouble() * 200.0) - 100.0),
         worldHeight / 2.0 + ((random.nextDouble() * 200.0) - 100.0),
         random.nextDouble() * 360.0,
       )));
-    }
-    ants.add(Ant(Position(200.0 + 0, worldHeight / 2.0 - 24, 0.0)));
-    ants.add(Ant(Position(200.0 + 0, worldHeight / 2.0 - 12, 15.0)));
-    ants.add(Ant(Position(200.0 + 0, worldHeight / 2.0 + 12, 170.0)));
-    ants.add(Ant(Position(200.0 + 100, worldHeight / 2.0 + 0, 85.0)));*/
+    }*/
+    ants.add(Ant(Position(200.0 + 0, worldHeight / 2.0 - 12, 0.0)));
+    ants.add(Ant(Position(200.0 + 0, worldHeight / 2.0 + 12, 45.0)));
     // DBG END
 
-    for (var i = 0; i < _antsNumber; ++i) {
+    /*for (var i = 0; i < _antsNumber; ++i) {
       ants.add(Ant(Position.random(worldWidth, worldHeight)));
-    }
+    }*/
   }
 
   final double worldWidth;
@@ -57,6 +55,9 @@ class ColonyController {
 
   PathRouter _pathRouter;
 
+  // DBG
+  List<Segment> get segments => _pathRouter.segments;
+
   void setTime(int hour, int minute) {
     _hour = hour;
     _minute = minute;
@@ -67,7 +68,7 @@ class ColonyController {
     _elapsed ??= elapsed;
 
     // DBG CODE TO TEST PATH ROUTER
-    /*if (ants.first.isAtDestination &&
+    if (ants.first.isAtDestination &&
         ants.first.position.x < worldWidth - 30.0) {
       _pathRouter ??= PathRouter(ants);
       final route = _pathRouter.route(
@@ -79,9 +80,9 @@ class ColonyController {
           ));
 
       ants.first.setRoute(route);
-    }*/
+    }
 
-    if (_shouldRenderTime) {
+    /*if (_shouldRenderTime) {
       _assignAntDigitPositions(_hour, _minute);
       _assignAntBoundaryPositions();
       _pathRouter = null;
@@ -90,7 +91,7 @@ class ColonyController {
       final antIndexList = _antBoundaryPositions.keys.toList();
       final antIndex = antIndexList[random.nextInt(antIndexList.length)];
       _assignAntBoundaryPosition(antIndex, skipAnts: true);
-    }
+    }*/
 
     /*if (_pathRouter == null && ants.every((a) => a.isAtDestination)) {
       _pathRouter = PathRouter(ants);

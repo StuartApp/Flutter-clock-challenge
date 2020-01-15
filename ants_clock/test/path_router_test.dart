@@ -212,6 +212,7 @@ void main() {
 
       final result = bs1.union(bs2);
 
+      expect(bs1.intersects(bs2), isTrue);
       expect(result.segments.length, 8);
       expect(result.segments.first.begin, result.segments.last.end);
     });
@@ -232,6 +233,7 @@ void main() {
 
       final result = bs1.union(bs2);
 
+      expect(bs1.intersects(bs2), isTrue);
       expect(result.segments.length, 9);
       expect(result.segments.first.begin, result.segments.last.end);
     });
@@ -250,6 +252,7 @@ void main() {
 
       final result = bs1.union(bs2);
 
+      expect(bs1.intersects(bs2), isTrue);
       expect(result.segments.length, 6);
       expect(result.segments.first.begin, result.segments.last.end);
     });
@@ -268,7 +271,27 @@ void main() {
 
       final result = bs1.union(bs2);
 
+      expect(bs1.intersects(bs2), isTrue);
       expect(result.segments.length, 10);
+      expect(result.segments.first.begin, result.segments.last.end);
+    });
+
+    test('Union of two Ants #3', () {
+      final bs1 = BoundingShape.fromAnt(Ant(Position(
+        200.0 + 0,
+        100.0 / 2.0 - 12,
+        0.0,
+      )));
+      final bs2 = BoundingShape.fromAnt(Ant(Position(
+        200.0 + 0,
+        100.0 / 2.0 + 12,
+        45.0,
+      )));
+
+      final result = bs1.union(bs2);
+
+      expect(bs1.intersects(bs2), isTrue);
+      expect(result.segments.length, 9);
       expect(result.segments.first.begin, result.segments.last.end);
     });
   });

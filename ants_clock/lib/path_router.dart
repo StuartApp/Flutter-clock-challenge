@@ -9,6 +9,10 @@ import 'math_utils.dart';
 class PathRouter {
   final List<BoundingShape> _boundingShapes = [];
 
+  // DBG
+  List<Segment> get segments =>
+      _boundingShapes.expand((bs) => bs.segments).toList();
+
   PathRouter(List<Ant> ants) {
     final boundingShapes =
         ants.map((ant) => BoundingShape.fromAnt(ant)).toList();
@@ -307,14 +311,14 @@ class BoundingShape {
 
   static Point<double> _getRotatedAntPoint(
       Ant ant, double xOffset, double yOffset) {
-    return rotatePoint(
+    return _roundPoint(rotatePoint(
       Point(
         ant.position.x + xOffset,
         ant.position.y + yOffset,
       ),
       ant.position.toPoint(),
       ant.position.bearing,
-    );
+    ));
   }
 }
 
@@ -431,6 +435,15 @@ class _Vertex {
 
   @override
   int get hashCode => point.hashCode;
+}
+
+Point<double> _roundPoint(Point<double> point) {
+  return Point(_round(point.x), _round(point.y));
+}
+
+double _round(double num) {
+  //return (num * 100.0).round() / 100.0;
+  return num.roundToDouble();
 }
 
 bool _pointIsCloseTo(Point<double> a, Point<double> b) {

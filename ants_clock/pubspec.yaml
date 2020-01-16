@@ -21,5 +21,6 @@ flutter:
   uses-material-design: true
 
   assets:
-    - assets/ant1.png
-    - assets/ant2.png
+    - assets/ant_frame_1.png
+    - assets/ant_frame_2.png
+    - assets/bg.png

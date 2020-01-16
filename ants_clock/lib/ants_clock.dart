@@ -78,9 +78,17 @@ class _AntsClockState extends State<AntsClock> {
 
   @override
   Widget build(BuildContext context) {
-    return Colony(
-      hour: _dateTime.hour,
-      minute: _dateTime.minute,
+    return Container(
+      decoration: BoxDecoration(
+        image: DecorationImage(
+          fit: BoxFit.cover,
+          image: AssetImage('assets/bg.png'),
+        ),
+      ),
+      child: Colony(
+        hour: _dateTime.hour,
+        minute: _dateTime.minute,
+      ),
     );
   }
 }

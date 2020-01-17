@@ -16,8 +16,9 @@ class Ground extends StatefulWidget {
 }
 
 class _GroundState extends State<Ground> with SingleTickerProviderStateMixin {
+  static const _leafSize = 50.0;
+
   AnimationController _windyController;
-  var _leafSize = 50.0;
 
   @override
   void initState() {
@@ -37,28 +38,13 @@ class _GroundState extends State<Ground> with SingleTickerProviderStateMixin {
   @override
   Widget build(BuildContext context) {
     _stopLeafAnimation();
+
     switch (widget.weatherCondition) {
-      case WeatherCondition.cloudy:
-        // TODO: Handle this case.
-        break;
-      case WeatherCondition.foggy:
-        // TODO: Handle this case.
-        break;
-      case WeatherCondition.rainy:
-        // TODO: Handle this case.
-        break;
-      case WeatherCondition.snowy:
-        // TODO: Handle this case.
-        break;
-      case WeatherCondition.sunny:
-        // TODO: Handle this case.
-        break;
-      case WeatherCondition.thunderstorm:
-        // TODO: Handle this case.
-        break;
       case WeatherCondition.windy:
         // animate to right:
         _windyController.animateTo(1.0);
+        break;
+      default:
         break;
     }
 
@@ -68,7 +54,7 @@ class _GroundState extends State<Ground> with SingleTickerProviderStateMixin {
           decoration: BoxDecoration(
             image: DecorationImage(
               fit: BoxFit.cover,
-              image: AssetImage('assets/bg_with_leaves.png'),
+              image: AssetImage(_getBackgroundImage()),
             ),
           ),
           child: Stack(
@@ -103,6 +89,27 @@ class _GroundState extends State<Ground> with SingleTickerProviderStateMixin {
         ),
       ),
     );
+  }
+
+  String _getBackgroundImage() {
+    switch (widget.weatherCondition) {
+      case WeatherCondition.cloudy:
+        return 'assets/bg_sunny.png';
+      case WeatherCondition.foggy:
+        return 'assets/bg_sunny.png';
+      case WeatherCondition.rainy:
+        return 'assets/bg_sunny.png';
+      case WeatherCondition.snowy:
+        return 'assets/bg_sunny.png';
+      case WeatherCondition.sunny:
+        return 'assets/bg_sunny.png';
+      case WeatherCondition.thunderstorm:
+        return 'assets/bg_sunny.png';
+      case WeatherCondition.windy:
+        return 'assets/bg_windy.png';
+      default:
+        return 'assets/bg_sunny.png';
+    }
   }
 
   void _stopLeafAnimation() {}

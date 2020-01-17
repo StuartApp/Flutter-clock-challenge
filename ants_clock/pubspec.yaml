@@ -23,7 +23,8 @@ flutter:
   assets:
     - assets/ant_frame_1.png
     - assets/ant_frame_2.png
-    - assets/bg_with_leaves.png
+    - assets/bg_windy.png
+    - assets/bg_sunny.png
     - assets/leaf_top_1.png
     - assets/leaf_top_2.png
     - assets/leaf_top_3.png

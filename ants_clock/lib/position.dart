@@ -89,6 +89,11 @@ class Position {
       bearing ?? this.bearing,
     );
   }
+
+  @override
+  String toString() {
+    return 'Position{x: $x, y: $y, bearing: $bearing}';
+  }
 }
 
 Position lerpPosition(Position begin, Position end, double t) {

@@ -48,7 +48,7 @@ double ccwVectorsAngle(
   final v2Mag = sqrt(pow(v2.x, 2) + pow(v2.y, 2));
   final dotProduct = v1.x * v2.x + v1.y * v2.y;
   final crossProductZ = v1.x * v2.y - v2.x * v1.y;
-  var angle = radToDeg(acos(dotProduct / (v1Mag * v2Mag)));
+  var angle = radToDeg(acos((dotProduct / (v1Mag * v2Mag)).clamp(-1.0, 1.0)));
   return crossProductZ < 0.0 || angle == 0.0 ? angle : 360.0 - angle;
 }
 

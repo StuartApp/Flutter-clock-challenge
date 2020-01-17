@@ -1,6 +1,7 @@
 import 'dart:math';
 
 import 'package:ants_clock/ant.dart';
+import 'package:ants_clock/math_utils.dart';
 import 'package:ants_clock/path_router.dart';
 import 'package:ants_clock/position.dart';
 import 'package:test/test.dart';
@@ -239,35 +240,19 @@ void main() {
     });
 
     test('Union of two Ants #1', () {
-      final bs1 = BoundingShape.fromAnt(Ant(Position(
-        203.71428571428572,
-        133.57142857142858,
-        0.48988011388701125,
-      )));
-      final bs2 = BoundingShape.fromAnt(Ant(Position(
-        203.71428571428572,
-        109.28571428571429,
-        358.6102085078564,
-      )));
+      final bs1 = BoundingShape.fromAnt(Ant(Position(203.7, 133.6, 0.5)));
+      final bs2 = BoundingShape.fromAnt(Ant(Position(203.7, 109.3, 358.6)));
 
       final result = bs1.union(bs2);
 
       expect(bs1.intersects(bs2), isTrue);
-      expect(result.segments.length, 6);
+      expect(result.segments.length, 8);
       expect(result.segments.first.begin, result.segments.last.end);
     });
 
     test('Union of two Ants #2', () {
-      final bs1 = BoundingShape.fromAnt(Ant(Position(
-        260.38095238095235,
-        80.95238095238096,
-        279.95092304648205,
-      )));
-      final bs2 = BoundingShape.fromAnt(Ant(Position(
-        244.19047619047618,
-        80.95238095238096,
-        83.60391833349462,
-      )));
+      final bs1 = BoundingShape.fromAnt(Ant(Position(260.4, 81.0, 280.0)));
+      final bs2 = BoundingShape.fromAnt(Ant(Position(244.2, 81.0, 83.6)));
 
       final result = bs1.union(bs2);
 
@@ -277,40 +262,39 @@ void main() {
     });
 
     test('Union of two Ants #3', () {
-      final bs1 = BoundingShape.fromAnt(Ant(Position(
-        200.0 + 0,
-        100.0 / 2.0 - 12,
-        0.0,
-      )));
-      final bs2 = BoundingShape.fromAnt(Ant(Position(
-        200.0 + 0,
-        100.0 / 2.0 + 12,
-        45.0,
-      )));
+      final bs1 = BoundingShape.fromAnt(Ant(Position(41.0, 52.0, 135.0)));
+      final bs2 = BoundingShape.fromAnt(Ant(Position(45.0, 49.0, 167.0)));
 
       final result = bs1.union(bs2);
 
       expect(bs1.intersects(bs2), isTrue);
-      expect(result.segments.length, 9);
+      expect(result.segments.length, 10);
       expect(result.segments.first.begin, result.segments.last.end);
     });
   });
 
   group('Path router', () {
-    test('test 1', () {
-      final size = Ant.size + (BoundingShape.antPadding * 2);
+    test('Detect union errors', () {
+      while (true) {
+        final ants = <Ant>[];
+        for (var i = 0; i < 3; ++i) {
+          final position = Position(
+            (50.0 + ((random.nextDouble() * 20.0) - 10.0)).roundToDouble(),
+            (50.0 + ((random.nextDouble() * 20.0) - 10.0)).roundToDouble(),
+            (random.nextDouble() * 360.0).roundToDouble(),
+          );
+          ants.add(Ant(position));
+        }
 
-      final ants = [
-        Ant(Position(0, 50.0, 0.0)),
-        Ant(Position(50.0, 50.0, 0.0)),
-        Ant(Position(50.0, 50.0 + size - 5.0, 0.0)),
-        Ant(Position(100.0, 50.0, 0.0)),
-      ];
+        final pr = PathRouter(ants);
 
-      final pathRouter = PathRouter(ants);
-      final route = pathRouter.route(ants.first, Position(150.0, 50.0, 0.0));
-
-      expect(route.length, 8);
-    });
+        if (pr.boundingShapes.length > 1) {
+          print('Error: ${pr.boundingShapes.length} bounding shapes');
+          for (var ant in ants) {
+            print(ant.position);
+          }
+        }
+      }
+    }, skip: false);
   });
 }

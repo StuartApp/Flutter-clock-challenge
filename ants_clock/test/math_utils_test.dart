@@ -61,5 +61,11 @@ void main() {
           ccwVectorsAngle(Point(1.0, 2.0), Point(1.0, 3.0), Point(1.0, 4.0));
       expect(angle, 0.0);
     });
+
+    test('180', () {
+      final angle = ccwVectorsAngle(
+          Point(209.0, 141.2), Point(219.8, 130.4), Point(200.0, 150.2));
+      expect(angle, 180.0);
+    });
   });
 }

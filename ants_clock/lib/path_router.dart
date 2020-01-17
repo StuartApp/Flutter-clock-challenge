@@ -10,6 +10,9 @@ class PathRouter {
   final List<BoundingShape> _boundingShapes = [];
 
   // DBG
+  List<BoundingShape> get boundingShapes => _boundingShapes;
+
+  // DBG
   List<Segment> get segments =>
       _boundingShapes.expand((bs) => bs.segments).toList();
 
@@ -27,7 +30,6 @@ class PathRouter {
 
           if (bs2.intersects(bs)) {
             bs = bs.union(bs2);
-            bs.relatedAnts.addAll(bs2.relatedAnts);
             bsToRemove.add(i);
           }
         }
@@ -82,7 +84,7 @@ class PathRouter {
         if (closestBSIntersection == null ||
             bsIntersection.squaredDistance <
                 closestBSIntersection.squaredDistance) {
-          if (!_pointIsCloseTo(bsIntersection.point, begin)) {
+          if (bsIntersection.point != begin) {
             closestBSIntersection = bsIntersection;
           }
         }
@@ -187,6 +189,8 @@ class BoundingShape {
     final thisShapeVertices = _getShapeVertices(other);
     final otherShapeVertices = other._getShapeVertices(this);
 
+    _unifyVertices(thisShapeVertices, otherShapeVertices);
+
     _linkVertices(thisShapeVertices);
     _linkVertices(otherShapeVertices);
     _linkCommonVertices(thisShapeVertices, otherShapeVertices);
@@ -206,7 +210,9 @@ class BoundingShape {
       currentVertex = nextVertex;
     }
 
-    return BoundingShape.fromPoints(points);
+    return BoundingShape.fromPoints(points)
+      ..relatedAnts.addAll(relatedAnts)
+      ..relatedAnts.addAll(other.relatedAnts);
   }
 
   List<_Vertex> _getShapeVertices(BoundingShape other) {
@@ -237,6 +243,30 @@ class BoundingShape {
     }
 
     return points;
+  }
+
+  void _unifyVertices(List<_Vertex> verticesA, List<_Vertex> verticesB) {
+    for (var vertices in [verticesA, verticesB]) {
+      for (var i = 0; i < vertices.length; ++i) {
+        var v1 = vertices[i];
+        for (var j = i + 1; j < vertices.length; ++j) {
+          var v2 = vertices[j];
+          if (v1.isClose(v2)) {
+            vertices[j] = v1.copy();
+          }
+        }
+      }
+    }
+    for (var v1 in verticesA) {
+      for (var i = 0; i < verticesB.length; ++i) {
+        var v2 = verticesB[i];
+        if (v1.isClose(v2)) {
+          verticesB[i] = v1.copy();
+        }
+      }
+    }
+    _removeListDuplicates(verticesA);
+    _removeListDuplicates(verticesB);
   }
 
   void _linkVertices(List<_Vertex> thisShapeVertices) {
@@ -306,19 +336,21 @@ class BoundingShape {
       bottom = max(bottom ?? s.begin.y, max(s.begin.y, s.end.y));
       left = min(left ?? s.begin.x, min(s.begin.x, s.end.x));
     }
-    return Rectangle.fromPoints(Point(left, top), Point(right, bottom));
+    var leftTop = Point(_roundDouble(left), _roundDouble(top));
+    var rightBottom = Point(_roundDouble(right), _roundDouble(bottom));
+    return Rectangle.fromPoints(leftTop, rightBottom);
   }
 
   static Point<double> _getRotatedAntPoint(
       Ant ant, double xOffset, double yOffset) {
-    return _roundPoint(rotatePoint(
+    return rotatePoint(
       Point(
         ant.position.x + xOffset,
         ant.position.y + yOffset,
       ),
       ant.position.toPoint(),
       ant.position.bearing,
-    ));
+    );
   }
 }
 
@@ -343,7 +375,13 @@ class Segment {
 
   final Rectangle<double> rectangle;
 
-  Segment(this.begin, this.end) : rectangle = Rectangle.fromPoints(begin, end);
+  Segment(Point<double> begin, Point<double> end)
+      : begin = _roundPoint(begin),
+        end = _roundPoint(end),
+        rectangle = Rectangle.fromPoints(
+          _roundPoint(begin),
+          _roundPoint(end),
+        );
 
   Point<double> getSegmentIntersection(Segment other) {
     if (!rectangle.intersects(other.rectangle)) return null;
@@ -380,6 +418,11 @@ class Segment {
     return closestIntersection;
   }
 
+  @override
+  String toString() {
+    return 'Segment{begin: $begin, end: $end}';
+  }
+
   Point<double> _calcIntersectionPoint(Segment other) {
     final m1 = begin.x != end.x
         ? (end.y - begin.y) / (end.x - begin.x)
@@ -407,7 +450,7 @@ class Segment {
       y = (m1 * x) + c1;
     }
 
-    return Point(x, y);
+    return Point(_roundDouble(x), _roundDouble(y));
   }
 }
 
@@ -426,6 +469,24 @@ class _Vertex {
     _visited = true;
   }
 
+  bool isClose(_Vertex other) {
+    return _pointsAreClose(point, other.point);
+  }
+
+  _Vertex copy() {
+    return _Vertex(point);
+  }
+
+  @override
+  String toString() {
+    final linked = linkedVertices.map((v) => v.point.toString()).join(', ');
+    return '_Vertex{'
+        'point: $point, '
+        'visited: $_visited, '
+        'linkedVertices: [$linked]'
+        '}';
+  }
+
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -438,14 +499,28 @@ class _Vertex {
 }
 
 Point<double> _roundPoint(Point<double> point) {
-  return Point(_round(point.x), _round(point.y));
+  return Point(_roundDouble(point.x), _roundDouble(point.y));
 }
 
-double _round(double num) {
-  //return (num * 100.0).round() / 100.0;
-  return num.roundToDouble();
+double _roundDouble(double num) {
+  return (num * 10.0).round() / 10.0;
 }
 
-bool _pointIsCloseTo(Point<double> a, Point<double> b) {
-  return (a.x - b.x).abs() < 0.001 && (a.y - b.y).abs() < 0.001;
+bool _pointsAreClose(Point<double> a, Point<double> b) {
+  return (b.x - a.x).abs() <= 1.0 && (b.y - a.y).abs() <= 1.0;
+}
+
+void _removeListDuplicates<T>(List<T> list) {
+  final itemsToRemove = <int>[];
+  for (var i = 1; i < list.length; ++i) {
+    if (list[i] == list[i - 1]) {
+      itemsToRemove.add(i);
+    }
+  }
+  /*if (list[list.length - 1] == list[0]) {
+    itemsToRemove.add(list.length - 1);
+  }*/
+  for (var i = itemsToRemove.length - 1; i >= 0; --i) {
+    list.removeAt(itemsToRemove[i]);
+  }
 }

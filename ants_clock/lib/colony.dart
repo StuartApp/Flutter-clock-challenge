@@ -103,6 +103,7 @@ class _BoundingShapePainter extends CustomPainter {
   _BoundingShapePainter(this._colonyController);
 
   final _paint = Paint()
+    ..strokeWidth = 2.0
     ..color = Colors.red
     ..style = PaintingStyle.stroke;
 

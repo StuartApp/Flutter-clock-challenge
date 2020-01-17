@@ -4,6 +4,7 @@
 
 import 'dart:async';
 
+import 'package:ants_clock/ground.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_clock_helper/model.dart';
 
@@ -78,17 +79,12 @@ class _AntsClockState extends State<AntsClock> {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        image: DecorationImage(
-          fit: BoxFit.cover,
-          image: AssetImage('assets/bg.png'),
-        ),
-      ),
+    return Ground(
       child: Colony(
         hour: _dateTime.hour,
         minute: _dateTime.minute,
       ),
+      weatherCondition: widget.model.weatherCondition,
     );
   }
 }

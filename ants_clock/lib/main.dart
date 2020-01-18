@@ -21,5 +21,8 @@ void main() {
     debugDefaultTargetPlatformOverride = TargetPlatform.fuchsia;
   }
 
-  runApp(ClockCustomizer((ClockModel model) => AntsClock(model)));
+  runApp(ClockCustomizer((ClockModel model) {
+    model.weatherCondition = WeatherCondition.windy;
+    return AntsClock(model);
+  }));
 }

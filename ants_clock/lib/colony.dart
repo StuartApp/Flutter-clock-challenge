@@ -31,6 +31,7 @@ class _ColonyState extends State<Colony> with SingleTickerProviderStateMixin {
 
     _ticker = createTicker((elapsed) {
       setState(() {
+        // TODO Set state only if tick returns true
         _colonyController?.tick(elapsed);
       });
     });

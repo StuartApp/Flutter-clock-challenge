@@ -3,7 +3,7 @@ import 'package:ants_clock/math_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 
-import 'ant.dart';
+import '../models/ant.dart';
 
 class Colony extends StatefulWidget {
   final int hour;
@@ -76,7 +76,8 @@ class _ColonyState extends State<Colony> with SingleTickerProviderStateMixin {
               transform: Matrix4.rotationZ(degToRad(ant.position.bearing)),
               origin: Offset(Ant.halfSize, Ant.halfSize),
               child: Image.asset(
-                ant.frame == 0 ? 'assets/ant_frame_1.png'
+                ant.frame == 0
+                    ? 'assets/ant_frame_1.png'
                     : 'assets/ant_frame_2.png',
                 width: Ant.size,
                 height: Ant.size,

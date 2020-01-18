@@ -9,7 +9,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_clock_helper/customizer.dart';
 import 'package:flutter_clock_helper/model.dart';
 
-import 'ants_clock.dart';
+import 'widgets/ants_clock.dart';
 
 void main() {
   // A temporary measure until Platform supports web and TargetPlatform supports
@@ -22,7 +22,6 @@ void main() {
   }
 
   runApp(ClockCustomizer((ClockModel model) {
-    model.weatherCondition = WeatherCondition.windy;
     return AntsClock(model);
   }));
 }

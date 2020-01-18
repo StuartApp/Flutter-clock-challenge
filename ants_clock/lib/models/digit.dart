@@ -1,5 +1,5 @@
 import 'package:ants_clock/math_utils.dart';
-import 'package:ants_clock/position.dart';
+import 'package:ants_clock/models/position.dart';
 
 abstract class Digit {
   factory Digit.number(

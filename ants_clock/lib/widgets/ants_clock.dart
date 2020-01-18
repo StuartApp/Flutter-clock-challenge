@@ -4,8 +4,8 @@
 
 import 'dart:async';
 
-import 'package:ants_clock/ground.dart';
-import 'package:ants_clock/windy_leaves.dart';
+import 'package:ants_clock/widgets/ground.dart';
+import 'package:ants_clock/widgets/windy_leaves.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_clock_helper/model.dart';
 

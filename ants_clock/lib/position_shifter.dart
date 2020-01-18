@@ -1,4 +1,4 @@
-import 'package:ants_clock/position.dart';
+import 'package:ants_clock/models/position.dart';
 import 'package:flutter/animation.dart';
 
 import 'math_utils.dart';

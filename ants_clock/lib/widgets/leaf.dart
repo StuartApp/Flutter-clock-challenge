@@ -60,9 +60,24 @@ class _LeafState extends State<Leaf> with SingleTickerProviderStateMixin {
 
   Animation<double> _createAnimation(bool forward) {
     if (forward) {
+      double endAngle;
+      switch (widget.side) {
+        case Side.top:
+          endAngle = 30.0 + random.nextDouble() * 15.0;
+          break;
+        case Side.bottom:
+          endAngle = -30.0 + random.nextDouble() * 15.0;
+          break;
+        case Side.left:
+          endAngle = -20.0 + random.nextDouble() * 10.0;
+          break;
+        case Side.right:
+          endAngle = 5.0 + random.nextDouble() * 5.0;
+          break;
+      }
       return Tween(
         begin: _animation?.value ?? 0.0,
-        end: 20.0 + random.nextDouble() * 15.0,
+        end: endAngle,
       )
           .chain(CurveTween(curve: Curves.bounceInOut))
           .animate(_animationController);
@@ -157,6 +172,76 @@ const _assets = [
     width: 78.0,
     height: 106.0,
     rotationOrigin: Offset(68.0, 0.0),
+  ),
+  _Asset(
+    side: Side.bottom,
+    assetNumber: 1,
+    width: 49.0,
+    height: 102.0,
+    rotationOrigin: Offset(39.0, 102.0),
+  ),
+  _Asset(
+    side: Side.bottom,
+    assetNumber: 2,
+    width: 112.0,
+    height: 87.0,
+    rotationOrigin: Offset(64.0, 87.0),
+  ),
+  _Asset(
+    side: Side.bottom,
+    assetNumber: 3,
+    width: 107.0,
+    height: 135.0,
+    rotationOrigin: Offset(8.0, 135.0),
+  ),
+  _Asset(
+    side: Side.bottom,
+    assetNumber: 4,
+    width: 59.0,
+    height: 105.0,
+    rotationOrigin: Offset(20.0, 105.0),
+  ),
+  _Asset(
+    side: Side.bottom,
+    assetNumber: 5,
+    width: 78.0,
+    height: 106.0,
+    rotationOrigin: Offset(40.0, 106.0),
+  ),
+  _Asset(
+    side: Side.left,
+    assetNumber: 1,
+    width: 73.0,
+    height: 94.0,
+    rotationOrigin: Offset(0.0, 51.0),
+  ),
+  _Asset(
+    side: Side.left,
+    assetNumber: 2,
+    width: 113.0,
+    height: 97.0,
+    rotationOrigin: Offset(0.0, 96.0),
+  ),
+  _Asset(
+    side: Side.right,
+    assetNumber: 1,
+    width: 68.0,
+    height: 69.0,
+    rotationOrigin: Offset(68.0, 9.0),
+  ),
+  _Asset(
+    side: Side.right,
+    assetNumber: 2,
+    width: 87.0,
+    height: 36.0,
+    rotationOrigin: Offset(87.0, 2.0),
+  ),
+  _Asset(
+    side: Side.right,
+    assetNumber: 3,
+    width: 112.0,
+    height: 64.0,
+    rotationOrigin: Offset(112.0, 32.0),
   ),
 ];
 

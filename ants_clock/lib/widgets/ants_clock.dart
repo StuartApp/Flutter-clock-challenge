@@ -4,6 +4,8 @@
 
 import 'dart:async';
 
+import 'package:ants_clock/widgets/ground.dart';
+import 'package:ants_clock/widgets/windy_leaves.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_clock_helper/model.dart';
 
@@ -51,36 +53,36 @@ class _AntsClockState extends State<AntsClock> {
   }
 
   void _updateModel() {
-    setState(() {
-      // Cause the clock to rebuild when the model changes.
-    });
+    setState(() => null);
   }
 
   void _updateTime() {
     setState(() {
       _dateTime = DateTime.now();
-      // Update once per minute. If you want to update every second, use the
-      // following code.
       _timer = Timer(
         Duration(minutes: 1) -
             Duration(seconds: _dateTime.second) -
             Duration(milliseconds: _dateTime.millisecond),
         _updateTime,
       );
-      // Update once per second, but make sure to do it at the beginning of each
-      // new second, so that the clock is accurate.
-      // _timer = Timer(
-      //   Duration(seconds: 1) - Duration(milliseconds: _dateTime.millisecond),
-      //   _updateTime,
-      // );
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    return Colony(
-      hour: _dateTime.hour,
-      minute: _dateTime.minute,
+    final weather = widget.model.weatherCondition;
+
+    return Ground(
+      child: Stack(
+        children: <Widget>[
+          Colony(
+            hour: _dateTime.hour,
+            minute: _dateTime.minute,
+          ),
+          WindyLeaves(weatherCondition: weather),
+        ],
+      ),
+      weatherCondition: weather,
     );
   }
 }

@@ -21,5 +21,23 @@ flutter:
   uses-material-design: true
 
   assets:
-    - assets/ant1.png
-    - assets/ant2.png
+    - assets/ant_frame_1.png
+    - assets/ant_frame_2.png
+    - assets/bg_windy.png
+    - assets/bg_sunny.png
+    - assets/leaf_top_1.png
+    - assets/leaf_top_2.png
+    - assets/leaf_top_3.png
+    - assets/leaf_top_4.png
+    - assets/leaf_top_5.png
+    - assets/leaf_right_1.png
+    - assets/leaf_right_2.png
+    - assets/leaf_right_3.png
+    - assets/leaf_bottom_1.png
+    - assets/leaf_bottom_2.png
+    - assets/leaf_bottom_3.png
+    - assets/leaf_bottom_4.png
+    - assets/leaf_bottom_5.png
+    - assets/leaf_left_1.png
+    - assets/leaf_left_2.png
+    - assets/leaf_anywhere_1.png

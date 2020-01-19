@@ -1,9 +1,9 @@
 import 'dart:math';
 
-import 'package:ants_clock/ant.dart';
 import 'package:ants_clock/math_utils.dart';
+import 'package:ants_clock/models/ant.dart';
+import 'package:ants_clock/models/position.dart';
 import 'package:ants_clock/path_router.dart';
-import 'package:ants_clock/position.dart';
 import 'package:test/test.dart';
 
 void main() {

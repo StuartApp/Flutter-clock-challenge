@@ -9,7 +9,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_clock_helper/customizer.dart';
 import 'package:flutter_clock_helper/model.dart';
 
-import 'ants_clock.dart';
+import 'widgets/ants_clock.dart';
 
 void main() {
   // A temporary measure until Platform supports web and TargetPlatform supports
@@ -21,5 +21,7 @@ void main() {
     debugDefaultTargetPlatformOverride = TargetPlatform.fuchsia;
   }
 
-  runApp(ClockCustomizer((ClockModel model) => AntsClock(model)));
+  runApp(ClockCustomizer((ClockModel model) {
+    return AntsClock(model);
+  }));
 }

@@ -1,9 +1,9 @@
-import 'package:ants_clock/digit.dart';
+import 'package:ants_clock/models/digit.dart';
+import 'package:ants_clock/models/position.dart';
 import 'package:ants_clock/path_router.dart';
-import 'package:ants_clock/position.dart';
 
-import 'ant.dart';
 import 'math_utils.dart';
+import 'models/ant.dart';
 
 class ColonyController {
   ColonyController(this.worldWidth, this.worldHeight, int hour, int minute) {

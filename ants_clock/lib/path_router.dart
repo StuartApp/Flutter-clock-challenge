@@ -1,9 +1,9 @@
 import 'dart:collection';
 import 'dart:math';
 
-import 'package:ants_clock/position.dart';
+import 'package:ants_clock/models/position.dart';
 
-import 'ant.dart';
+import 'models/ant.dart';
 import 'math_utils.dart';
 
 class PathRouter {

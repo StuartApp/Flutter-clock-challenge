@@ -13,15 +13,13 @@ class ColonyController {
 
     // DBG BEGIN CODE TO TEST PATH ROUTER
     ants.add(Ant(Position(30.0, worldHeight / 2.0, 0.0)));
-    ants.add(Ant(Position(41.0, 52.0, 135.0)));
-    ants.add(Ant(Position(45.0, 49.0, 167.0)));
-    /*for (var i = 0; i < 30; ++i) {
+    for (var i = 0; i < 30; ++i) {
       ants.add(Ant(Position(
         250.0 + ((random.nextDouble() * 200.0) - 100.0),
         worldHeight / 2.0 + ((random.nextDouble() * 200.0) - 100.0),
         random.nextDouble() * 360.0,
       )));
-    }*/
+    }
     // DBG END
 
     /*for (var i = 0; i < _antsNumber; ++i) {

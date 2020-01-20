@@ -39,15 +39,15 @@ class _GroundState extends State<Ground> {
       case WeatherCondition.cloudy:
         return 'assets/bg_sunny.png';
       case WeatherCondition.foggy:
-        return 'assets/bg_sunny.png';
+        return 'assets/bg_foggy.png';
       case WeatherCondition.rainy:
-        return 'assets/bg_sunny.png';
+        return 'assets/bg_rainy.png';
       case WeatherCondition.snowy:
-        return 'assets/bg_sunny.png';
+        return 'assets/bg_snowy.png';
       case WeatherCondition.sunny:
         return 'assets/bg_sunny.png';
       case WeatherCondition.thunderstorm:
-        return 'assets/bg_sunny.png';
+        return 'assets/bg_thunderstorm.png';
       case WeatherCondition.windy:
         return 'assets/bg_windy.png';
     }

@@ -55,25 +55,25 @@ class _RainDropsState extends State<RainDrops> {
   @override
   Widget build(BuildContext context) {
     final weather = widget.weatherCondition;
-    if (weather != WeatherCondition.rainy &&
-        weather != WeatherCondition.thunderstorm) {
+    if (weather == WeatherCondition.rainy ||
+        weather == WeatherCondition.thunderstorm) {
+      return LayoutBuilder(
+        builder: (context, constraints) {
+          _initTimer(constraints);
+          return Stack(
+            children: _buildRainDrops(),
+          );
+        },
+      );
+    } else {
       return Container();
     }
-
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        _initTimer(constraints);
-
-        return Stack(
-          children: _buildRainDrops(),
-        );
-      },
-    );
   }
 
   void _initTimer(BoxConstraints constraints) {
-    if (_width == constraints.maxWidth && _height == constraints.maxHeight)
+    if (_width == constraints.maxWidth && _height == constraints.maxHeight) {
       return;
+    }
 
     _width = constraints.maxWidth;
     _height = constraints.maxHeight;
@@ -101,7 +101,7 @@ class _RainDropsState extends State<RainDrops> {
   }
 
   List<Widget> _buildRainDrops() {
-    return _rainDropPositions.map((rainDropPosition) {
+    return _rainDropPositions.map<Widget>((rainDropPosition) {
       return Positioned(
         child: rainDropPosition.rainDrop,
         left: rainDropPosition.left,

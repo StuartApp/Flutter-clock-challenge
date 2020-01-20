@@ -2,8 +2,9 @@ import 'package:flutter/material.dart';
 
 class Cloud extends StatefulWidget {
   final int assetNumber;
+  final BoxConstraints constraints;
 
-  const Cloud({Key key, this.assetNumber}) : super(key: key);
+  const Cloud({Key key, this.assetNumber, this.constraints}) : super(key: key);
 
   @override
   _CloudState createState() => _CloudState();
@@ -18,7 +19,7 @@ class _CloudState extends State<Cloud> with SingleTickerProviderStateMixin {
   void initState() {
     _animationController = AnimationController(
       vsync: this,
-      duration: Duration(milliseconds: 10000 * widget.assetNumber),
+      duration: Duration(milliseconds: 4000 * widget.assetNumber * 2),
     );
 
     var movingForward = true;
@@ -27,12 +28,10 @@ class _CloudState extends State<Cloud> with SingleTickerProviderStateMixin {
       if (status == AnimationStatus.completed) {
         if (movingForward) {
           _animation = _createAnimation(false);
-          _animationController.duration = Duration(milliseconds: 10000 * widget.assetNumber);
           _animationController.forward(from: 0.0);
           movingForward = false;
         } else {
           _animation = _createAnimation(true);
-          _animationController.duration = Duration(milliseconds: 10000 * widget.assetNumber);
           _animationController.forward(from: 0.0);
           movingForward = true;
         }
@@ -51,13 +50,13 @@ class _CloudState extends State<Cloud> with SingleTickerProviderStateMixin {
         return 0;
         break;
       case 2:
-        return -50;
+        return 0 - widget.constraints.maxHeight / 3.0;
         break;
       case 3:
-        return 100;
+        return widget.constraints.maxHeight / 3.0;
         break;
       case 4:
-        return 150;
+        return (widget.constraints.maxHeight / 3.0) * 2.0;
         break;
       default:
         return 0;
@@ -66,7 +65,7 @@ class _CloudState extends State<Cloud> with SingleTickerProviderStateMixin {
   }
 
   Animation<double> _createAnimation(bool forward) {
-    double endX = (800.0 * widget.assetNumber) / 4;
+    double endX = widget.constraints.maxWidth * (1  + widget.assetNumber/10.0);
     if (forward) {
       return Tween(
         begin: _animation?.value ?? 0 - endX,
@@ -88,7 +87,7 @@ class _CloudState extends State<Cloud> with SingleTickerProviderStateMixin {
       builder: (context, child) {
         return Transform(
           transform: Matrix4.translationValues(_animation.value, _initialY(), 0),
-          origin: Offset(100, (widget.assetNumber * 50).toDouble()),
+          origin: Offset(100.0 * widget.assetNumber, _initialY()),
           child: child,
         );
       },

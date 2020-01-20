@@ -8,6 +8,7 @@ import 'package:ants_clock/widgets/cloudy.dart';
 import 'package:ants_clock/widgets/fog.dart';
 import 'package:ants_clock/widgets/ground.dart';
 import 'package:ants_clock/widgets/rain_drops.dart';
+import 'package:ants_clock/widgets/snow_flakes.dart';
 import 'package:ants_clock/widgets/thunder_lightning.dart';
 import 'package:ants_clock/widgets/windy_leaves.dart';
 import 'package:flutter/material.dart';
@@ -90,6 +91,7 @@ class _AntsClockState extends State<AntsClock> {
           ThunderLightning(weatherCondition: weather),
           Cloudy(weatherCondition: weather),
           Fog(weatherCondition: weather),
+          SnowFlakes(weatherCondition: weather),
         ],
       ),
       weatherCondition: weather,

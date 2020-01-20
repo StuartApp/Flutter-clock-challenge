@@ -6,6 +6,7 @@ import 'dart:async';
 
 import 'package:ants_clock/widgets/cloudy.dart';
 import 'package:ants_clock/widgets/ground.dart';
+import 'package:ants_clock/widgets/rain_drops.dart';
 import 'package:ants_clock/widgets/windy_leaves.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_clock_helper/model.dart';
@@ -81,6 +82,7 @@ class _AntsClockState extends State<AntsClock> {
             minute: _dateTime.minute,
           ),
           WindyLeaves(weatherCondition: weather),
+          RainDrops(weatherCondition: weather),
           Cloudy(weatherCondition: weather,)
         ],
       ),

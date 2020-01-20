@@ -19,7 +19,7 @@ class _RainDropsState extends State<RainDrops> {
 
   final List<_RainDropPosition> _rainDropPositions = [];
 
-  int rainDropInterval;
+  int _rainDropInterval;
 
   Timer _timer;
 
@@ -30,7 +30,7 @@ class _RainDropsState extends State<RainDrops> {
   @override
   void initState() {
     super.initState();
-    rainDropInterval = _getRainDropInterval();
+    _rainDropInterval = _getRainDropInterval();
   }
 
   @override
@@ -43,7 +43,7 @@ class _RainDropsState extends State<RainDrops> {
   void didUpdateWidget(RainDrops oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (widget.weatherCondition != oldWidget.weatherCondition) {
-      rainDropInterval = _getRainDropInterval();
+      _rainDropInterval = _getRainDropInterval();
 
       _timer?.cancel();
 
@@ -80,7 +80,7 @@ class _RainDropsState extends State<RainDrops> {
 
     _rainDropPositions.clear();
     _timer?.cancel();
-    _timer = Timer.periodic(Duration(milliseconds: rainDropInterval), (timer) {
+    _timer = Timer.periodic(Duration(milliseconds: _rainDropInterval), (timer) {
       setState(() {
         final rainDropKey = GlobalKey<_RainDropState>();
 

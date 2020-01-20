@@ -14,12 +14,15 @@ class RainDrops extends StatefulWidget {
 }
 
 class _RainDropsState extends State<RainDrops> {
-  static const rainyRainDropInterval = 100;
-  static const thunderstormRainDropInterval = 25;
+  static const _rainDropsInterval = 100;
+
+  static const _dropsPerIntervalWhenRainy = 1;
+
+  static const _dropsPerIntervalWhenThunderstorm = 5;
 
   final List<_RainDropPosition> _rainDropPositions = [];
 
-  int _rainDropInterval;
+  int _dropsPerInterval;
 
   Timer _timer;
 
@@ -30,7 +33,7 @@ class _RainDropsState extends State<RainDrops> {
   @override
   void initState() {
     super.initState();
-    _rainDropInterval = _getRainDropInterval();
+    _dropsPerInterval = _getDropsPerInterval();
   }
 
   @override
@@ -43,7 +46,7 @@ class _RainDropsState extends State<RainDrops> {
   void didUpdateWidget(RainDrops oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (widget.weatherCondition != oldWidget.weatherCondition) {
-      _rainDropInterval = _getRainDropInterval();
+      _dropsPerInterval = _getDropsPerInterval();
 
       _timer?.cancel();
 
@@ -80,22 +83,24 @@ class _RainDropsState extends State<RainDrops> {
 
     _rainDropPositions.clear();
     _timer?.cancel();
-    _timer = Timer.periodic(Duration(milliseconds: _rainDropInterval), (timer) {
+    _timer = Timer.periodic(Duration(milliseconds: _rainDropsInterval), (timer) {
       setState(() {
-        final rainDropKey = GlobalKey<_RainDropState>();
-
-        final _RainDropPosition rainDropPosition = _RainDropPosition(
-          randomDouble(0.0, _width - _RainDropState.rainDropSize),
-          randomDouble(0.0, _height - _RainDropState.rainDropSize),
-          _RainDrop(key: rainDropKey),
-          rainDropKey,
-        );
-
         _rainDropPositions.removeWhere((position) {
           return position.rainDropKey.currentState?.isCompleted ?? true;
         });
 
-        _rainDropPositions.add(rainDropPosition);
+        for (var i = 0; i < _dropsPerInterval; ++i) {
+          final rainDropKey = GlobalKey<_RainDropState>();
+
+          final _RainDropPosition rainDropPosition = _RainDropPosition(
+            randomDouble(0.0, _width - _RainDropState.rainDropSize),
+            randomDouble(0.0, _height - _RainDropState.rainDropSize),
+            _RainDrop(key: rainDropKey),
+            rainDropKey,
+          );
+
+          _rainDropPositions.add(rainDropPosition);
+        }
       });
     });
   }
@@ -110,10 +115,10 @@ class _RainDropsState extends State<RainDrops> {
     }).toList();
   }
 
-  int _getRainDropInterval() {
+  int _getDropsPerInterval() {
     return widget.weatherCondition == WeatherCondition.rainy
-        ? rainyRainDropInterval
-        : thunderstormRainDropInterval;
+        ? _dropsPerIntervalWhenRainy
+        : _dropsPerIntervalWhenThunderstorm;
   }
 }
 
@@ -176,7 +181,7 @@ class _RainDropState extends State<_RainDrop>
 class _CustomPainter extends CustomPainter {
   static const Color _color = Color.fromRGBO(34, 144, 156, 1.0);
 
-  static const double _beginOpacity = 0.5;
+  static const double _beginOpacity = 0.60;
 
   final double t;
 

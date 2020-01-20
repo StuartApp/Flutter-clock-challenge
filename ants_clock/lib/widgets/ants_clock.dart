@@ -79,7 +79,9 @@ class _AntsClockState extends State<AntsClock> {
       child: Stack(
         children: <Widget>[
           Colony(
-            hour: _dateTime.hour,
+            hour: widget.model.is24HourFormat
+                ? _dateTime.hour
+                : _formatTo12Hours(_dateTime.hour),
             minute: _dateTime.minute,
           ),
           WindyLeaves(weatherCondition: weather),
@@ -90,5 +92,9 @@ class _AntsClockState extends State<AntsClock> {
       ),
       weatherCondition: weather,
     );
+  }
+
+  int _formatTo12Hours(int hour) {
+    return _dateTime.hour <= 12 ? _dateTime.hour : _dateTime.hour - 12;
   }
 }

@@ -37,7 +37,7 @@ class ColonyController {
 
   final List<Ant> ants = [];
 
-  static const _antsNumber = 60;
+  static const _antsNumber = 65;
 
   static const _boundaryPadding = 10.0;
 

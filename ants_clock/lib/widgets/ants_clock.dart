@@ -5,6 +5,7 @@
 import 'dart:async';
 
 import 'package:ants_clock/widgets/cloudy.dart';
+import 'package:ants_clock/widgets/fog.dart';
 import 'package:ants_clock/widgets/ground.dart';
 import 'package:ants_clock/widgets/rain_drops.dart';
 import 'package:ants_clock/widgets/thunder_lightning.dart';
@@ -87,7 +88,8 @@ class _AntsClockState extends State<AntsClock> {
           WindyLeaves(weatherCondition: weather),
           RainDrops(weatherCondition: weather),
           ThunderLightning(weatherCondition: weather),
-          Cloudy(weatherCondition: weather)
+          Cloudy(weatherCondition: weather),
+          Fog(weatherCondition: weather),
         ],
       ),
       weatherCondition: weather,

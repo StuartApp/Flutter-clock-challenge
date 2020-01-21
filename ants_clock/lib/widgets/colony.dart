@@ -1,6 +1,7 @@
 import 'package:ants_clock/colony_controller.dart';
 import 'package:ants_clock/math_utils.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter/scheduler.dart';
 
 import '../models/ant.dart';
@@ -73,10 +74,6 @@ class _ColonyState extends State<Colony> with SingleTickerProviderStateMixin {
 
         final widgets = <Widget>[];
 
-        widgets.add(CustomPaint(
-          painter: _BoundingShapePainter(_colonyController),
-        ));
-
         for (var ant in _colonyController.ants) {
           String imageFilename;
           if (widget.isDarkMode) {
@@ -109,30 +106,5 @@ class _ColonyState extends State<Colony> with SingleTickerProviderStateMixin {
         );
       },
     );
-  }
-}
-
-class _BoundingShapePainter extends CustomPainter {
-  final ColonyController _colonyController;
-
-  _BoundingShapePainter(this._colonyController);
-
-  final _paint = Paint()
-    ..strokeWidth = 2.0
-    ..color = Colors.red
-    ..style = PaintingStyle.stroke;
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    for (var segment in _colonyController.segments) {
-      final begin = Offset(segment.begin.x, segment.begin.y);
-      final end = Offset(segment.end.x, segment.end.y);
-      canvas.drawLine(begin, end, _paint);
-    }
-  }
-
-  @override
-  bool shouldRepaint(CustomPainter oldDelegate) {
-    return true;
   }
 }

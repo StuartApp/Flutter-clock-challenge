@@ -52,4 +52,12 @@ double ccwVectorsAngle(
   return crossProductZ < 0.0 || angle == 0.0 ? angle : 360.0 - angle;
 }
 
+double randomDouble(double min, double max) {
+  return (random.nextDouble() * (max - min)) + min;
+}
+
+int randomInt(int min, int max) {
+  return random.nextInt(max - min) + min;
+}
+
 final random = Random();

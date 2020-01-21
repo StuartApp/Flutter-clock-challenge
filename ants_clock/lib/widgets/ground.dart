@@ -6,10 +6,13 @@ class Ground extends StatefulWidget {
 
   final WeatherCondition weatherCondition;
 
+  final bool isDarkMode;
+
   const Ground({
     Key key,
     @required this.child,
     @required this.weatherCondition,
+    @required this.isDarkMode,
   }) : super(key: key);
 
   @override
@@ -35,19 +38,23 @@ class _GroundState extends State<Ground> {
   }
 
   String _getBackgroundImage() {
+    if (widget.isDarkMode) {
+      return 'assets/bg_dark.png';
+    }
+
     switch (widget.weatherCondition) {
       case WeatherCondition.cloudy:
         return 'assets/bg_sunny.png';
       case WeatherCondition.foggy:
-        return 'assets/bg_sunny.png';
+        return 'assets/bg_foggy.png';
       case WeatherCondition.rainy:
-        return 'assets/bg_sunny.png';
+        return 'assets/bg_rainy.png';
       case WeatherCondition.snowy:
-        return 'assets/bg_sunny.png';
+        return 'assets/bg_snowy.png';
       case WeatherCondition.sunny:
         return 'assets/bg_sunny.png';
       case WeatherCondition.thunderstorm:
-        return 'assets/bg_sunny.png';
+        return 'assets/bg_thunderstorm.png';
       case WeatherCondition.windy:
         return 'assets/bg_windy.png';
     }

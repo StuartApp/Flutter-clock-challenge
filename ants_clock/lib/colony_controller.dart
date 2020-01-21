@@ -33,7 +33,7 @@ class ColonyController {
 
   final List<Ant> ants = [];
 
-  static const _antsNumber = 60;
+  static const _antsNumber = 65;
 
   static const _boundaryPadding = 10.0;
 
@@ -190,20 +190,20 @@ class ColonyController {
   }
 
   List<Digit> _createDigits(int hour, int minute) {
-    final width = worldHeight / 3.0;
-    final height = worldHeight / 3.0;
+    final width = worldHeight / 5.0;
+    final height = worldHeight / 3.5;
 
     final digits = [
       Digit.number(
         hour ~/ 10,
-        worldWidth / 2.0 - ((width / 2.0) * 3.0),
+        worldWidth / 2.0 - width * 2.0,
         worldHeight / 2.0,
         width,
         height,
       ),
       Digit.number(
         hour % 10,
-        worldWidth / 2.0 - ((width / 2.0) * 1.2),
+        worldWidth / 2.0 - width * 1.0,
         worldHeight / 2.0,
         width,
         height,
@@ -216,14 +216,14 @@ class ColonyController {
       ),
       Digit.number(
         minute ~/ 10,
-        worldWidth / 2.0 + ((width / 2.0) * 1.2),
+        worldWidth / 2.0 + width * 1.0,
         worldHeight / 2.0,
         width,
         height,
       ),
       Digit.number(
         minute % 10,
-        worldWidth / 2.0 + ((width / 2.0) * 3.0),
+        worldWidth / 2.0 + width * 2.0,
         worldHeight / 2.0,
         width,
         height,

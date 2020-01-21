@@ -39,12 +39,16 @@ class _NumberDigit implements Digit {
   static const _top2 = Position(0.6, 0.0, _horizontal);
   static const _topLeft1 = Position(0.25, 0.1, _vertical);
   static const _topLeft2 = Position(0.25, 0.35, _vertical);
+  static const _topCenter1 = Position(0.5, 0.1, _vertical);
+  static const _topCenter2 = Position(0.5, 0.35, _vertical);
   static const _topRight1 = Position(0.75, 0.1, _vertical);
   static const _topRight2 = Position(0.75, 0.35, _vertical);
   static const _middle1 = Position(0.4, 0.5, _horizontal);
   static const _middle2 = Position(0.6, 0.5, _horizontal);
   static const _bottomLeft1 = Position(0.25, 0.65, _vertical);
   static const _bottomLeft2 = Position(0.25, 0.9, _vertical);
+  static const _bottomCenter1 = Position(0.5, 0.65, _vertical);
+  static const _bottomCenter2 = Position(0.5, 0.9, _vertical);
   static const _bottomRight1 = Position(0.75, 0.65, _vertical);
   static const _bottomRight2 = Position(0.75, 0.9, _vertical);
   static const _bottom1 = Position(0.4, 1.0, _horizontal);
@@ -55,14 +59,18 @@ class _NumberDigit implements Digit {
     _top2: [0, 2, 3, 5, 6, 7, 8, 9],
     _topLeft1: [0, 4, 5, 6, 8, 9],
     _topLeft2: [0, 4, 5, 6, 8, 9],
-    _topRight1: [0, 1, 2, 3, 4, 7, 8, 9],
-    _topRight2: [0, 1, 2, 3, 4, 7, 8, 9],
+    _topCenter1: [1],
+    _topCenter2: [1],
+    _topRight1: [0, 2, 3, 4, 7, 8, 9],
+    _topRight2: [0, 2, 3, 4, 7, 8, 9],
     _middle1: [2, 3, 4, 5, 6, 8, 9],
     _middle2: [2, 3, 4, 5, 6, 8, 9],
     _bottomLeft1: [0, 2, 6, 8],
     _bottomLeft2: [0, 2, 6, 8],
-    _bottomRight1: [0, 1, 3, 4, 5, 6, 7, 8, 9],
-    _bottomRight2: [0, 1, 3, 4, 5, 6, 7, 8, 9],
+    _bottomCenter1: [1],
+    _bottomCenter2: [1],
+    _bottomRight1: [0, 3, 4, 5, 6, 7, 8, 9],
+    _bottomRight2: [0, 3, 4, 5, 6, 7, 8, 9],
     _bottom1: [0, 2, 3, 5, 6, 8],
     _bottom2: [0, 2, 3, 5, 6, 8],
   };

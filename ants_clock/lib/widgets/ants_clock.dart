@@ -4,7 +4,12 @@
 
 import 'dart:async';
 
+import 'package:ants_clock/widgets/cloudy.dart';
+import 'package:ants_clock/widgets/fog.dart';
 import 'package:ants_clock/widgets/ground.dart';
+import 'package:ants_clock/widgets/rain_drops.dart';
+import 'package:ants_clock/widgets/snow_flakes.dart';
+import 'package:ants_clock/widgets/thunder_lightning.dart';
 import 'package:ants_clock/widgets/windy_leaves.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_clock_helper/model.dart';
@@ -71,18 +76,32 @@ class _AntsClockState extends State<AntsClock> {
   @override
   Widget build(BuildContext context) {
     final weather = widget.model.weatherCondition;
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
 
     return Ground(
       child: Stack(
         children: <Widget>[
           Colony(
-            hour: _dateTime.hour,
+            hour: widget.model.is24HourFormat
+                ? _dateTime.hour
+                : _formatTo12Hours(_dateTime.hour),
             minute: _dateTime.minute,
+            isDarkMode: isDarkMode,
           ),
           WindyLeaves(weatherCondition: weather),
+          RainDrops(weatherCondition: weather),
+          ThunderLightning(weatherCondition: weather),
+          Cloudy(weatherCondition: weather),
+          Fog(weatherCondition: weather),
+          SnowFlakes(weatherCondition: weather),
         ],
       ),
       weatherCondition: weather,
+      isDarkMode: isDarkMode,
     );
+  }
+
+  int _formatTo12Hours(int hour) {
+    return _dateTime.hour <= 12 ? _dateTime.hour : _dateTime.hour - 12;
   }
 }

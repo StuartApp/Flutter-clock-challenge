@@ -7,7 +7,13 @@ import 'package:flutter_clock_helper/model.dart';
 class RainDrops extends StatefulWidget {
   final WeatherCondition weatherCondition;
 
-  const RainDrops({Key key, this.weatherCondition}) : super(key: key);
+  final bool isDarkMode;
+
+  const RainDrops({
+    Key key,
+    @required this.weatherCondition,
+    @required this.isDarkMode,
+  }) : super(key: key);
 
   @override
   _RainDropsState createState() => _RainDropsState();
@@ -45,7 +51,8 @@ class _RainDropsState extends State<RainDrops> {
   @override
   void didUpdateWidget(RainDrops oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (widget.weatherCondition != oldWidget.weatherCondition) {
+    if (widget.weatherCondition != oldWidget.weatherCondition ||
+        widget.isDarkMode != oldWidget.isDarkMode) {
       _dropsPerInterval = _getDropsPerInterval();
 
       _timer?.cancel();
@@ -58,8 +65,9 @@ class _RainDropsState extends State<RainDrops> {
   @override
   Widget build(BuildContext context) {
     final weather = widget.weatherCondition;
-    if (weather == WeatherCondition.rainy ||
-        weather == WeatherCondition.thunderstorm) {
+    if (!widget.isDarkMode &&
+        (weather == WeatherCondition.rainy ||
+            weather == WeatherCondition.thunderstorm)) {
       return LayoutBuilder(
         builder: (context, constraints) {
           _initTimer(constraints);
@@ -83,7 +91,8 @@ class _RainDropsState extends State<RainDrops> {
 
     _rainDropPositions.clear();
     _timer?.cancel();
-    _timer = Timer.periodic(Duration(milliseconds: _rainDropsInterval), (timer) {
+    _timer =
+        Timer.periodic(Duration(milliseconds: _rainDropsInterval), (timer) {
       setState(() {
         _rainDropPositions.removeWhere((position) {
           return position.rainDropKey.currentState?.isCompleted ?? true;

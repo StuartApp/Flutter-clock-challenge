@@ -7,7 +7,13 @@ import 'package:flutter_clock_helper/model.dart';
 class SnowFlakes extends StatefulWidget {
   final WeatherCondition weatherCondition;
 
-  const SnowFlakes({Key key, this.weatherCondition}) : super(key: key);
+  final bool isDarkMode;
+
+  const SnowFlakes({
+    Key key,
+    @required this.weatherCondition,
+    @required this.isDarkMode,
+  }) : super(key: key);
 
   @override
   _SnowFlakesState createState() => _SnowFlakesState();
@@ -40,7 +46,8 @@ class _SnowFlakesState extends State<SnowFlakes> {
   @override
   void didUpdateWidget(SnowFlakes oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (widget.weatherCondition != oldWidget.weatherCondition) {
+    if (widget.weatherCondition != oldWidget.weatherCondition ||
+        widget.isDarkMode != oldWidget.isDarkMode) {
       _timer?.cancel();
       _width = null;
       _height = null;
@@ -49,7 +56,8 @@ class _SnowFlakesState extends State<SnowFlakes> {
 
   @override
   Widget build(BuildContext context) {
-    if (widget.weatherCondition == WeatherCondition.snowy) {
+    if (widget.weatherCondition == WeatherCondition.snowy &&
+        !widget.isDarkMode) {
       return LayoutBuilder(
         builder: (context, constraints) {
           _initTimer(constraints);

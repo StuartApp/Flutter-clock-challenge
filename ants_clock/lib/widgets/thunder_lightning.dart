@@ -7,7 +7,13 @@ import 'package:flutter_clock_helper/model.dart';
 class ThunderLightning extends StatefulWidget {
   final WeatherCondition weatherCondition;
 
-  const ThunderLightning({Key key, this.weatherCondition}) : super(key: key);
+  final bool isDarkMode;
+
+  const ThunderLightning({
+    Key key,
+    @required this.weatherCondition,
+    @required this.isDarkMode,
+  }) : super(key: key);
 
   @override
   _ThunderLightningState createState() => _ThunderLightningState();
@@ -41,7 +47,7 @@ class _ThunderLightningState extends State<ThunderLightning>
         .chain(CurveTween(curve: Curves.bounceOut))
         .animate(_animationController);
 
-    if (widget.weatherCondition == WeatherCondition.thunderstorm) {
+    if (_isActive()) {
       _startTimer();
     }
   }
@@ -63,8 +69,9 @@ class _ThunderLightningState extends State<ThunderLightning>
   void didUpdateWidget(ThunderLightning oldWidget) {
     super.didUpdateWidget(oldWidget);
 
-    if (widget.weatherCondition != oldWidget.weatherCondition) {
-      if (widget.weatherCondition == WeatherCondition.thunderstorm) {
+    if (widget.weatherCondition != oldWidget.weatherCondition ||
+        widget.isDarkMode != oldWidget.isDarkMode) {
+      if (_isActive()) {
         _startTimer();
       } else {
         _animationController.reset();
@@ -75,7 +82,7 @@ class _ThunderLightningState extends State<ThunderLightning>
 
   @override
   Widget build(BuildContext context) {
-    if (widget.weatherCondition == WeatherCondition.thunderstorm) {
+    if (_isActive()) {
       return FadeTransition(
         opacity: _animation,
         child: Container(color: Colors.white),
@@ -83,5 +90,10 @@ class _ThunderLightningState extends State<ThunderLightning>
     } else {
       return Container();
     }
+  }
+
+  bool _isActive() {
+    return widget.weatherCondition == WeatherCondition.thunderstorm &&
+        !widget.isDarkMode;
   }
 }

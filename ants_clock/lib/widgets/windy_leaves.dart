@@ -6,9 +6,12 @@ import 'leaf.dart';
 class WindyLeaves extends StatefulWidget {
   final WeatherCondition weatherCondition;
 
+  final bool isDarkMode;
+
   const WindyLeaves({
     Key key,
     @required this.weatherCondition,
+    @required this.isDarkMode,
   }) : super(key: key);
 
   @override
@@ -18,7 +21,8 @@ class WindyLeaves extends StatefulWidget {
 class _WindyLeavesState extends State<WindyLeaves> {
   @override
   Widget build(BuildContext context) {
-    if (widget.weatherCondition == WeatherCondition.windy) {
+    if (widget.weatherCondition == WeatherCondition.windy &&
+        !widget.isDarkMode) {
       return LayoutBuilder(
         builder: (context, constraints) {
           return Stack(

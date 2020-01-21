@@ -6,7 +6,13 @@ import '../math_utils.dart';
 class Fog extends StatefulWidget {
   final WeatherCondition weatherCondition;
 
-  const Fog({Key key, this.weatherCondition}) : super(key: key);
+  final bool isDarkMode;
+
+  const Fog({
+    Key key,
+    @required this.weatherCondition,
+    @required this.isDarkMode,
+  }) : super(key: key);
 
   @override
   _FogState createState() => _FogState();
@@ -39,7 +45,7 @@ class _FogState extends State<Fog> with SingleTickerProviderStateMixin {
 
     _animation = _createAnimation();
 
-    if (widget.weatherCondition == WeatherCondition.foggy) {
+    if (_isActive()) {
       _animationController.forward();
     }
   }
@@ -63,8 +69,9 @@ class _FogState extends State<Fog> with SingleTickerProviderStateMixin {
   @override
   void didUpdateWidget(Fog oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (widget.weatherCondition != oldWidget.weatherCondition) {
-      if (widget.weatherCondition == WeatherCondition.foggy) {
+    if (widget.weatherCondition != oldWidget.weatherCondition ||
+        widget.isDarkMode != oldWidget.isDarkMode) {
+      if (_isActive()) {
         _animationController.forward();
       } else {
         _animationController.reset();
@@ -74,7 +81,7 @@ class _FogState extends State<Fog> with SingleTickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
-    if (widget.weatherCondition == WeatherCondition.foggy) {
+    if (_isActive()) {
       return AnimatedBuilder(
         animation: _animation,
         builder: (context, child) {
@@ -90,5 +97,10 @@ class _FogState extends State<Fog> with SingleTickerProviderStateMixin {
     } else {
       return Container();
     }
+  }
+
+  bool _isActive() {
+    return widget.weatherCondition == WeatherCondition.foggy &&
+        !widget.isDarkMode;
   }
 }

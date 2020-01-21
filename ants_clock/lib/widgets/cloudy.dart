@@ -6,7 +6,13 @@ import 'cloud.dart';
 class Cloudy extends StatefulWidget {
   final WeatherCondition weatherCondition;
 
-  const Cloudy({Key key, this.weatherCondition}) : super(key: key);
+  final bool isDarkMode;
+
+  const Cloudy({
+    Key key,
+    @required this.weatherCondition,
+    @required this.isDarkMode,
+  }) : super(key: key);
 
   @override
   _CloudyState createState() => _CloudyState();
@@ -15,7 +21,8 @@ class Cloudy extends StatefulWidget {
 class _CloudyState extends State<Cloudy> {
   @override
   Widget build(BuildContext context) {
-    if (widget.weatherCondition == WeatherCondition.cloudy) {
+    if (widget.weatherCondition == WeatherCondition.cloudy &&
+        !widget.isDarkMode) {
       return LayoutBuilder(
         builder: (context, constraints) {
           return Stack(children: [

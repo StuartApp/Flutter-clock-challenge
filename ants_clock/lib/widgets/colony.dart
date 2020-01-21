@@ -10,10 +10,13 @@ class Colony extends StatefulWidget {
 
   final int minute;
 
+  final bool isDarkMode;
+
   const Colony({
     Key key,
     @required this.hour,
     @required this.minute,
+    @required this.isDarkMode,
   }) : super(key: key);
 
   @override
@@ -71,14 +74,23 @@ class _ColonyState extends State<Colony> with SingleTickerProviderStateMixin {
         final widgets = <Widget>[];
 
         for (var ant in _colonyController.ants) {
+          String imageFilename;
+          if (widget.isDarkMode) {
+            imageFilename = ant.frame == 0
+                ? 'assets/ant_dark_frame_1.png'
+                : 'assets/ant_dark_frame_2.png';
+          } else {
+            imageFilename = ant.frame == 0
+                ? 'assets/ant_frame_1.png'
+                : 'assets/ant_frame_2.png';
+          }
+
           widgets.add(Positioned(
             child: Transform(
               transform: Matrix4.rotationZ(degToRad(ant.position.bearing)),
               origin: Offset(Ant.halfSize, Ant.halfSize),
               child: Image.asset(
-                ant.frame == 0
-                    ? 'assets/ant_frame_1.png'
-                    : 'assets/ant_frame_2.png',
+                imageFilename,
                 width: Ant.size,
                 height: Ant.size,
               ),

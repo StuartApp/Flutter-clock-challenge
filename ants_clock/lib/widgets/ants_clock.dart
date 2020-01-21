@@ -76,6 +76,7 @@ class _AntsClockState extends State<AntsClock> {
   @override
   Widget build(BuildContext context) {
     final weather = widget.model.weatherCondition;
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
 
     return Ground(
       child: Stack(
@@ -85,6 +86,7 @@ class _AntsClockState extends State<AntsClock> {
                 ? _dateTime.hour
                 : _formatTo12Hours(_dateTime.hour),
             minute: _dateTime.minute,
+            isDarkMode: isDarkMode,
           ),
           WindyLeaves(weatherCondition: weather),
           RainDrops(weatherCondition: weather),
@@ -95,6 +97,7 @@ class _AntsClockState extends State<AntsClock> {
         ],
       ),
       weatherCondition: weather,
+      isDarkMode: isDarkMode,
     );
   }
 

@@ -21,8 +21,11 @@ flutter:
   uses-material-design: true
 
   assets:
+    - assets/ant_dark_frame_1.png
+    - assets/ant_dark_frame_2.png
     - assets/ant_frame_1.png
     - assets/ant_frame_2.png
+    - assets/bg_dark.png
     - assets/bg_foggy.png
     - assets/bg_rainy.png
     - assets/bg_snowy.png

@@ -57,13 +57,6 @@ class PathRouter {
     _connectAllWayPoints();
   }
 
-  void _connectAllWayPoints() async {
-    for (var wp in _wayPoints) {
-      _connectWayPoint(wp, _wayPoints);
-      await Future.delayed(Duration.zero);
-    }
-  }
-
   void addPoint(Point<double> point) {
     _markGrid(point, true);
   }
@@ -141,6 +134,17 @@ class PathRouter {
       for (var x = topLeft.x; x < bottomRight.x; ++x) {
         _grid[y][x] = value;
       }
+    }
+  }
+
+  void _connectAllWayPoints() async {
+    for (var wp in _wayPoints) {
+      _connectWayPoint(wp, _wayPoints);
+
+      // A better approach will be to do some computations in another isolate,
+      // but since we are out of time that's the best we can do to avoid long
+      // pauses in the main thread.
+      await Future.delayed(Duration.zero);
     }
   }
 

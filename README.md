@@ -18,11 +18,11 @@ Is there a thunderstorm right now? Just check Ants Clock:
 
 ![Thunderstorm animation](assets/thunderstorm.gif)
 
-Moreover, you can check Ants Clock to see if it's a windy day:
+Also, you can check Ants Clock to see if it's a windy day:
 
 ![Windy day animation](assets/windy.gif)
 
-Also, more weather conditions like foggy, cloudy or rainy days are supported.
+More weather conditions like foggy, cloudy or rainy days are supported.
 
 Additionally, there is a nice night mode that is very useful when the light emitted by the clock can be annoying.
 

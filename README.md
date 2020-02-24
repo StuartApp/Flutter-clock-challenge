@@ -1,6 +1,6 @@
 # Ants Clock by Stuart
 
-This is a Flutter project made by [https://stuart.com](Stuart) to provide a beautiful clock face for Flutter Clock Challenge.
+This is a Flutter project made by [Stuart](https://stuart.com) to provide a beautiful clock face for Flutter Clock Challenge.
 
 More info about the contest can be found at [flutter.dev/clock](https://flutter.dev/clock).
 
@@ -30,10 +30,10 @@ Additionally there is a nice night mode, that is very useful when the light emit
 
 ![Stuart logo](assets/stuart_logo.png)
 
-*Logistics for a sustainable world: shared, efficient and reliable.*
+**Logistics for a sustainable world: shared, efficient and reliable.**
 
 At Stuart we connect businesses, customers and couriers to revolutionise the way goods are transported in cities.
 
-If you want to know more about what we do in Stuart engineering team, please check out our [https://medium.com/stuart-engineering](Medium blog).
+If you want to know more about what we do in Stuart engineering team, please check out our [Medium blog](https://medium.com/stuart-engineering).
 
-Like what you see? We’re hiring! 🚀 [https://stuart.com/jobs/](Check out our open engineering positions).
+Like what you see? We’re hiring! 🚀 [Check out our open engineering positions](https://stuart.com/jobs/).
